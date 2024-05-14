@@ -1,5 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 class ProfilePage extends StatelessWidget {
   final User? user;
@@ -9,6 +10,9 @@ class ProfilePage extends StatelessWidget {
   Future<void> _logout(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
+      final prefs = await SharedPreferences.getInstance();
+      prefs.remove('hasSeenWelcomeBanner');
+      prefs.remove('hasSeenGuestBanner');
       if (context.mounted) {
         Navigator.of(context).popUntil(ModalRoute.withName('/'));
       }
