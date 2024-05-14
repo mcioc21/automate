@@ -15,7 +15,8 @@ class ProfilePage extends StatelessWidget {
       prefs.remove('hasSeenGuestBanner');
       prefs.remove('vehicles'); // Clear the vehicle list
       if (context.mounted) {
-        Navigator.of(context).popUntil(ModalRoute.withName('/'));
+        //Navigator.of(context).popUntil(ModalRoute.withName('/'));
+        Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false,);
       }
     } catch (e) {
       if (context.mounted) {
@@ -34,6 +35,9 @@ class ProfilePage extends StatelessWidget {
       // Navigate to the login screen or handle login logic here
       Navigator.of(context).pushNamed('/login');
       final prefs = await SharedPreferences.getInstance();
+      if(prefs.getBool('isGuest') != false) {
+        prefs.setBool('isGuest', false);
+      }
       prefs.remove('vehicles'); // Clear the vehicle list
     } catch (e) {
       if (context.mounted) {

@@ -29,3 +29,18 @@ class AppColors {
     brightness: Brightness.light,
   );
 }
+
+class AppTheme {
+  static ThemeData get theme {
+    return ThemeData(
+      colorScheme: AppColors.colorScheme,
+      elevatedButtonTheme: ElevatedButtonThemeData(
+        style: ElevatedButton.styleFrom(
+          backgroundColor: AppColors.blue,
+          foregroundColor: AppColors.snow,
+        ),
+      ),
+      scaffoldBackgroundColor: AppColors.snow,
+    );
+  }
+}

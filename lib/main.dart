@@ -7,10 +7,12 @@ import 'package:automate/login.dart';
 import 'package:automate/register.dart';
 import 'package:provider/provider.dart';
 import 'package:automate/user_provider.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
+  print('Firebase initialized');
 
   runApp(
     ChangeNotifierProvider(
@@ -29,65 +31,97 @@ class MainApp extends StatefulWidget {
 
 class _MainAppState extends State<MainApp> {
   late Stream<User?> _idTokenStream;
+  User? _user;
+  bool _isGuest = false;
+  bool _initialized = false;
 
   @override
   void initState() {
     super.initState();
-    // Listen for ID token changes and update UserProvider
+    print('initState: _initialized=$_initialized');
+    _initializeApp();
+  }
+
+  Future<void> _initializeApp() async {
+    final prefs = await SharedPreferences.getInstance();
+    print('SharedPreferences obtained');
+
     _idTokenStream = FirebaseAuth.instance.idTokenChanges();
+    print('FirebaseAuth idTokenChanges stream obtained');
+
     _idTokenStream.listen((user) {
-      context.read<UserProvider>().setUser(user);
+      print('idTokenStream listener: user=$user');
+      setState(() {
+        _user = user;
+        context.read<UserProvider>().setUser(user);
+        if (user == null) {
+          print('User signed out or not logged in');
+          _isGuest = prefs.getBool('isGuest') ?? false;
+        } else {
+          print('User signed in: ${user.email}');
+          _isGuest = false;
+        }
+      });
+    }, onError: (error) {
+      print('Error in idTokenStream listener: $error');
+    });
+
+    setState(() {
+      _initialized = true;
+      print('Initialization complete: _initialized=$_initialized');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    return MaterialApp(
-      debugShowCheckedModeBanner: false,
-      theme: ThemeData(
-        colorScheme: AppColors.colorScheme,
-        elevatedButtonTheme: ElevatedButtonThemeData(
-          style: ElevatedButton.styleFrom(
-            backgroundColor: AppColors.blue,
-            foregroundColor: AppColors.snow,
+    print('Building MainApp');
+    if (!_initialized) {
+      return const MaterialApp(
+        home: Scaffold(
+          body: Center(
+            child: CircularProgressIndicator(),
           ),
         ),
-        scaffoldBackgroundColor: AppColors.snow,
-      ),
-      home: StreamBuilder<User?>(
-        stream: _idTokenStream,
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.active) {
-            User? user = snapshot.data;
-            if (user == null) {
-              // No user signed in, show choose login screen
-              return const ChooseLoginScreen();
-            } else {
-              // User is signed in, show home screen
-              return const HomeScreen();
-            }
-          } else {
-            // Connection state is not yet active, show loading indicator
-            return const Scaffold(
-              body: Center(
-                child: CircularProgressIndicator(),
-              ),
-            );
-          }
-        },
-      ),
-      routes: {
-        '/login': (context) => const LoginPage(),
-        '/register': (context) => const RegisterPage(),
-        '/dashboard': (context) => const HomeScreen(),
-      },
-    );
+      );
+    } else {
+      if (_user == null && !_isGuest) {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.theme,
+          home: const ChooseLoginScreen(),
+          routes: {
+            '/login': (context) => const LoginPage(),
+            '/register': (context) => const RegisterPage(),
+            '/dashboard': (context) => const HomeScreen(),
+          },
+        );
+      } else {
+        return MaterialApp(
+          debugShowCheckedModeBanner: false,
+          theme: AppTheme.theme,
+          home: const HomeScreen(),
+          routes: {
+            '/login': (context) => const LoginPage(),
+            '/register': (context) => const RegisterPage(),
+            '/dashboard': (context) => const HomeScreen(),
+          },
+        );
+      }
+    }
   }
 }
 
-
 class ChooseLoginScreen extends StatelessWidget {
   const ChooseLoginScreen({super.key});
+
+  Future<void> _continueAsGuest(BuildContext context) async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.setBool('isGuest', true);
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(builder: (context) => const HomeScreen()),
+    );
+  }
 
   @override
   Widget build(BuildContext context) {
@@ -164,14 +198,9 @@ class ChooseLoginScreen extends StatelessWidget {
                   backgroundColor: MaterialStateProperty.all<Color>(Colors.transparent),
                   foregroundColor: MaterialStateProperty.all<Color>(AppColors.blue),
                 ),
-                onPressed: () {
-                  Navigator.push(
-                    context,
-                    MaterialPageRoute(builder: (context) => const HomeScreen()),
-                  );
-                },
+                onPressed: () => _continueAsGuest(context),
                 child: const Text('Continue as Guest'),
-                  ),
+              ),
             ),
           ],
         ),

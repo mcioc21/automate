@@ -82,7 +82,7 @@ class _LoginPageState extends State<LoginPage> {
               const SizedBox(height: 16.0),
               ElevatedButton(
                 onPressed: _isLoading ? null : _login,
-                child: _isLoading ? const CircularProgressIndicator() : const Text('Login', style: TextStyle(color: AppColors.blue),),
+                child: _isLoading ? const CircularProgressIndicator() : const Text('Login', style: TextStyle(color: AppColors.snow),),
               ),
               if (_error.isNotEmpty)
                 Padding(
