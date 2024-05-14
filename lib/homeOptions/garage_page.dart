@@ -1,11 +1,13 @@
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'vehicle.dart'; // Importing the vehicle object
 import 'add_vehicle.dart';
 import 'edit_vehicle.dart'; // Import the edit vehicle page
 
 class GaragePage extends StatefulWidget {
-  const GaragePage({super.key});
+  final User? user;
 
+  const GaragePage({super.key, this.user});
   @override
   _GaragePageState createState() => _GaragePageState();
 }

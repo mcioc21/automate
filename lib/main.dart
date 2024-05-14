@@ -5,12 +5,19 @@ import 'package:automate/colors.dart';
 import 'package:automate/home.dart';
 import 'package:automate/login.dart';
 import 'package:automate/register.dart';
+import 'package:provider/provider.dart';
+import 'package:automate/user_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
 
-  runApp(const MainApp());
+  runApp(
+    ChangeNotifierProvider(
+      create: (context) => UserProvider(),
+      child: const MainApp(),
+    ),
+  );
 }
 
 class MainApp extends StatefulWidget {
@@ -26,8 +33,11 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    // Listen for ID token changes
+    // Listen for ID token changes and update UserProvider
     _idTokenStream = FirebaseAuth.instance.idTokenChanges();
+    _idTokenStream.listen((user) {
+      context.read<UserProvider>().setUser(user);
+    });
   }
 
   @override
@@ -74,6 +84,7 @@ class _MainAppState extends State<MainApp> {
     );
   }
 }
+
 
 class ChooseLoginScreen extends StatelessWidget {
   const ChooseLoginScreen({super.key});

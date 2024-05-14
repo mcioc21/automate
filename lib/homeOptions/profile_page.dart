@@ -2,23 +2,24 @@ import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class ProfilePage extends StatelessWidget {
-  const ProfilePage({super.key});
+  final User? user;
+
+  const ProfilePage({super.key, this.user});
 
   Future<void> _logout(BuildContext context) async {
     try {
       await FirebaseAuth.instance.signOut();
-      // Navigate back to the login screen or any other desired screen after logout
-      if(context.mounted) {
-        Navigator.of(context).popUntil(ModalRoute.withName('/')); // Example navigation
+      if (context.mounted) {
+        Navigator.of(context).popUntil(ModalRoute.withName('/'));
       }
     } catch (e) {
-      if(context.mounted) {
+      if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(
-        const SnackBar(
-          content: Text('Log out was not possible at this time, please try again later.'),
-          duration: Duration(seconds: 5), // Optional: Set the duration to display the snackbar
-        ),
-      );
+          const SnackBar(
+            content: Text('Log out was not possible at this time, please try again later.'),
+            duration: Duration(seconds: 5),
+          ),
+        );
       }
     }
   }
@@ -29,11 +30,19 @@ class ProfilePage extends StatelessWidget {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: <Widget>[
-          //Text(FirebaseAuth.instance.currentUser?.uid != null ? 'No user logged in' : FirebaseAuth.instance.currentUser?.email.toString() ?? ''),
-          Text(FirebaseAuth.instance.currentUser?.email ?? 'No user logged in'),
+          Text(user?.email ?? 'No user logged in'),
           ElevatedButton(
-            onPressed: () => _logout(context),
-            child: const Text('Logout'),
+            onPressed: () {
+              if (user != null) {
+                _logout(context);
+              } else {
+                Navigator.of(context).pushNamed('/login');
+              }
+            },
+            style: ButtonStyle(
+              backgroundColor: MaterialStateProperty.all<Color>(user != null ? Colors.red : Colors.green),
+            ),
+            child: Text(user != null ? 'Logout' : 'Log In'),
           ),
         ],
       ),
