@@ -13,6 +13,7 @@ class ProfilePage extends StatelessWidget {
       final prefs = await SharedPreferences.getInstance();
       prefs.remove('hasSeenWelcomeBanner');
       prefs.remove('hasSeenGuestBanner');
+      prefs.remove('vehicles'); // Clear the vehicle list
       if (context.mounted) {
         Navigator.of(context).popUntil(ModalRoute.withName('/'));
       }
@@ -21,6 +22,24 @@ class ProfilePage extends StatelessWidget {
         ScaffoldMessenger.of(context).showSnackBar(
           const SnackBar(
             content: Text('Log out was not possible at this time, please try again later.'),
+            duration: Duration(seconds: 5),
+          ),
+        );
+      }
+    }
+  }
+
+  Future<void> _login(BuildContext context) async {
+    try {
+      // Navigate to the login screen or handle login logic here
+      Navigator.of(context).pushNamed('/login');
+      final prefs = await SharedPreferences.getInstance();
+      prefs.remove('vehicles'); // Clear the vehicle list
+    } catch (e) {
+      if (context.mounted) {
+        ScaffoldMessenger.of(context).showSnackBar(
+          const SnackBar(
+            content: Text('Log in was not possible at this time, please try again later.'),
             duration: Duration(seconds: 5),
           ),
         );
@@ -40,7 +59,7 @@ class ProfilePage extends StatelessWidget {
               if (user != null) {
                 _logout(context);
               } else {
-                Navigator.of(context).pushNamed('/login');
+                _login(context);
               }
             },
             style: ButtonStyle(

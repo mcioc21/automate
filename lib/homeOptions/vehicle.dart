@@ -1,5 +1,3 @@
-//import 'package:flutter/material.dart';
-
 class Vehicle {
   final String name;
   final String vinNumber;
@@ -23,5 +21,15 @@ class Vehicle {
       'name': name,
       'vinNumber': vinNumber,
     };
+  }
+
+  // Convert a list of Vehicles to a list of maps
+  static List<Map<String, dynamic>> toMapList(List<Vehicle> vehicles) {
+    return vehicles.map((vehicle) => vehicle.toMap()).toList();
+  }
+
+  // Convert a list of maps to a list of Vehicles
+  static List<Vehicle> fromMapList(List<dynamic> maps) {
+    return maps.map((map) => Vehicle.fromMap(map)).toList();
   }
 }

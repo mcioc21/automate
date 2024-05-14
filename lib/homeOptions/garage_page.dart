@@ -1,5 +1,7 @@
+import 'dart:convert'; // Import for JSON encoding and decoding
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
+import 'package:shared_preferences/shared_preferences.dart';
 import 'vehicle.dart'; // Importing the vehicle object
 import 'add_vehicle.dart';
 import 'edit_vehicle.dart'; // Import the edit vehicle page
@@ -8,6 +10,7 @@ class GaragePage extends StatefulWidget {
   final User? user;
 
   const GaragePage({super.key, this.user});
+
   @override
   _GaragePageState createState() => _GaragePageState();
 }
@@ -15,10 +18,47 @@ class GaragePage extends StatefulWidget {
 class _GaragePageState extends State<GaragePage> {
   List<Vehicle> _vehicles = [];
 
+  @override
+  void initState() {
+    super.initState();
+    _loadVehicles();
+  }
+
+  // Function to load vehicles from shared preferences if user is not logged in
+  Future<void> _loadVehicles() async {
+    if (widget.user == null) {
+      final prefs = await SharedPreferences.getInstance();
+      final String? vehiclesString = prefs.getString('vehicles');
+
+      if (vehiclesString != null) {
+        final List<dynamic> vehiclesList = jsonDecode(vehiclesString);
+        setState(() {
+          _vehicles = Vehicle.fromMapList(vehiclesList);
+        });
+      }
+    }
+  }
+
+  // Function to save vehicles to shared preferences if user is not logged in
+  Future<void> _saveVehicles() async {
+    if (widget.user == null) {
+      final prefs = await SharedPreferences.getInstance();
+      final String vehiclesString = jsonEncode(Vehicle.toMapList(_vehicles));
+      await prefs.setString('vehicles', vehiclesString);
+    }
+  }
+
+  // Function to clear vehicles from shared preferences
+  Future<void> _clearVehicles() async {
+    final prefs = await SharedPreferences.getInstance();
+    await prefs.remove('vehicles');
+  }
+
   // Function to add a new vehicle to the list
   void _addVehicle(String name, String vinNumber) {
     setState(() {
       _vehicles.add(Vehicle(name: name, vinNumber: vinNumber));
+      _saveVehicles();
     });
   }
 
@@ -26,6 +66,7 @@ class _GaragePageState extends State<GaragePage> {
   void _removeVehicle(int index) {
     setState(() {
       _vehicles.removeAt(index);
+      _saveVehicles();
     });
   }
 
@@ -55,6 +96,7 @@ class _GaragePageState extends State<GaragePage> {
                               setState(() {
                                 // Update the vehicle details
                                 _vehicles[index] = Vehicle(name: name, vinNumber: vinNumber);
+                                _saveVehicles();
                               });
                             },
                           ),

@@ -36,8 +36,11 @@ class _MyHomeScreenState extends State<HomeScreen> {
 
     return Scaffold(
       appBar: AppBar(
-        title: const Text('AutoMate'),
-        automaticallyImplyLeading: false,
+        title: Container(
+          padding: const EdgeInsets.only(left: 25.0),  // Adjust this value to move the title further right
+          child: const Text('AutoMate'),
+        ),
+        automaticallyImplyLeading: false,  // Remove the back button
       ),
       body: _pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
