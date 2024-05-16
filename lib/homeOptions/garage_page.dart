@@ -18,6 +18,7 @@ class GaragePage extends StatefulWidget {
 
 class _GaragePageState extends State<GaragePage> {
   List<Vehicle> _vehicles = [];
+  bool _isLoading = true;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
@@ -27,12 +28,17 @@ class _GaragePageState extends State<GaragePage> {
   }
 
   Future<void> _loadVehicles() async {
+    setState(() {
+      _isLoading = true;
+    });
+
     if (widget.user != null) {
       var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
       var snapshot = await collection.get();
       var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data() as Map<String, dynamic>..putIfAbsent('uid', () => doc.id))).toList();
       setState(() {
         _vehicles = vehicles;
+        _isLoading = false;
       });
     } else {
       final prefs = await SharedPreferences.getInstance();
@@ -44,6 +50,9 @@ class _GaragePageState extends State<GaragePage> {
           _vehicles = Vehicle.fromMapList(vehiclesList);
         });
       }
+      setState(() {
+        _isLoading = false;
+      });
     }
   }
 
@@ -105,87 +114,88 @@ class _GaragePageState extends State<GaragePage> {
   }
 
   @override
-  Widget build(BuildContext context) {
+@override
+Widget build(BuildContext context) {
     return Scaffold(
-      body: _vehicles.isEmpty
-          ? const Center(
-              child: Text('Add your first vehicle'),
-            )
-          : ListView.builder(
-              itemCount: _vehicles.length,
-              itemBuilder: (context, index) {
-                final vehicle = _vehicles[index];
-                return Padding(
-                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                  child: GestureDetector(
-                    onTap: () {
-                      Navigator.push(
-                        context,
-                        MaterialPageRoute(
-                          builder: (context) => EditVehiclePage(
-                            name: vehicle.name,
-                            vinNumber: vehicle.vinNumber,
-                            editVehicleCallback: (name, vin) {
-                              _editVehicle(index, name, vin);
-                            },
-                          ),
-                        ),
-                      );
-                    },
-                    child: Stack(
-                      children: [
-                        Container(
-                          height: 60,
-                          decoration: BoxDecoration(
-                            color: Colors.grey[300],
-                            borderRadius: BorderRadius.circular(20.0),
-                          ),
-                          child: Row(
-                            children: [
-                              const SizedBox(width: 20),
-                              Text(
-                                vehicle.name,
-                                style: const TextStyle(fontSize: 18.0),
-                              ),
-                              const Spacer(),
-                              GestureDetector(
-                                onTap: () => _removeVehicle(index),
-                                child: Container(
-                                  width: 40,
-                                  alignment: Alignment.center,
-                                  decoration: const BoxDecoration(
-                                    shape: BoxShape.circle,
-                                    color: Colors.red,
-                                  ),
-                                  child: const Icon(
-                                    Icons.close,
-                                    color: Colors.white,
-                                    size: 24,
-                                  ),
+        body: _isLoading
+            ? const Center(child: CircularProgressIndicator()) // Show loading indicator while fetching data
+            : _vehicles.isEmpty
+                ? const Center(child: Text('Add your first vehicle')) // Show this text if no vehicles are present
+                : ListView.builder( // Show this list if there are vehicles
+                    itemCount: _vehicles.length,
+                    itemBuilder: (context, index) {
+                        final vehicle = _vehicles[index];
+                        return Padding(
+                            padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                            child: GestureDetector(
+                                onTap: () {
+                                    Navigator.push(
+                                        context,
+                                        MaterialPageRoute(
+                                            builder: (context) => EditVehiclePage(
+                                                name: vehicle.name,
+                                                vinNumber: vehicle.vinNumber,
+                                                editVehicleCallback: (name, vin) {
+                                                    _editVehicle(index, name, vin);
+                                                },
+                                            ),
+                                        ),
+                                    );
+                                },
+                                child: Stack(
+                                    children: [
+                                        Container(
+                                            height: 60,
+                                            decoration: BoxDecoration(
+                                                color: Colors.grey[300],
+                                                borderRadius: BorderRadius.circular(20.0),
+                                            ),
+                                            child: Row(
+                                                children: [
+                                                    const SizedBox(width: 20),
+                                                    Text(
+                                                        vehicle.name,
+                                                        style: const TextStyle(fontSize: 18.0),
+                                                    ),
+                                                    const Spacer(),
+                                                    GestureDetector(
+                                                        onTap: () => _removeVehicle(index),
+                                                        child: Container(
+                                                            width: 40,
+                                                            alignment: Alignment.center,
+                                                            decoration: const BoxDecoration(
+                                                                shape: BoxShape.circle,
+                                                                color: Colors.red,
+                                                            ),
+                                                            child: const Icon(
+                                                                Icons.close,
+                                                                color: Colors.white,
+                                                                size: 24,
+                                                            ),
+                                                        ),
+                                                    ),
+                                                    const SizedBox(width: 20),
+                                                ],
+                                            ),
+                                        ),
+                                    ],
                                 ),
-                              ),
-                              const SizedBox(width: 20),
-                            ],
-                          ),
-                        ),
-                      ],
+                            ),
+                        );
+                    },
+                ),
+        floatingActionButton: FloatingActionButton(
+            onPressed: () {
+                Navigator.push(
+                    context,
+                    MaterialPageRoute(
+                        builder: (context) => AddVehiclePage(addVehicleCallback: _addVehicle),
                     ),
-                  ),
                 );
-              },
-            ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddVehiclePage(addVehicleCallback: _addVehicle),
-            ),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
+            },
+            child: const Icon(Icons.add),
+        ),
     );
-  }
+}
 
 }
