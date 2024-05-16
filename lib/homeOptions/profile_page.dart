@@ -13,7 +13,10 @@ class ProfilePage extends StatelessWidget {
       final prefs = await SharedPreferences.getInstance();
       prefs.remove('hasSeenWelcomeBanner');
       prefs.remove('hasSeenGuestBanner');
-      prefs.remove('vehicles'); // Clear the vehicle list
+      if (prefs.containsKey('vehicles')) {
+        prefs.remove('vehicles'); // Clear the vehicle list
+      }
+      await prefs.clear();
       if (context.mounted) {
         //Navigator.of(context).popUntil(ModalRoute.withName('/'));
         Navigator.pushNamedAndRemoveUntil(context, '/', (Route<dynamic> route) => false,);
@@ -38,7 +41,9 @@ class ProfilePage extends StatelessWidget {
       if(prefs.getBool('isGuest') != false) {
         prefs.setBool('isGuest', false);
       }
-      prefs.remove('vehicles'); // Clear the vehicle list
+      if (prefs.containsKey('vehicles')) {
+        prefs.remove('vehicles'); // Clear the vehicle list
+      }
     } catch (e) {
       if (context.mounted) {
         ScaffoldMessenger.of(context).showSnackBar(

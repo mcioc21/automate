@@ -12,7 +12,6 @@ import 'package:shared_preferences/shared_preferences.dart';
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-  print('Firebase initialized');
 
   runApp(
     ChangeNotifierProvider(
@@ -38,43 +37,34 @@ class _MainAppState extends State<MainApp> {
   @override
   void initState() {
     super.initState();
-    print('initState: _initialized=$_initialized');
     _initializeApp();
   }
 
   Future<void> _initializeApp() async {
     final prefs = await SharedPreferences.getInstance();
-    print('SharedPreferences obtained');
 
     _idTokenStream = FirebaseAuth.instance.idTokenChanges();
-    print('FirebaseAuth idTokenChanges stream obtained');
 
     _idTokenStream.listen((user) {
-      print('idTokenStream listener: user=$user');
       setState(() {
         _user = user;
         context.read<UserProvider>().setUser(user);
         if (user == null) {
-          print('User signed out or not logged in');
           _isGuest = prefs.getBool('isGuest') ?? false;
         } else {
-          print('User signed in: ${user.email}');
           _isGuest = false;
         }
       });
     }, onError: (error) {
-      print('Error in idTokenStream listener: $error');
     });
 
     setState(() {
       _initialized = true;
-      print('Initialization complete: _initialized=$_initialized');
     });
   }
 
   @override
   Widget build(BuildContext context) {
-    print('Building MainApp');
     if (!_initialized) {
       return const MaterialApp(
         home: Scaffold(

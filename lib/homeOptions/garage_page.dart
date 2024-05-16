@@ -1,10 +1,11 @@
-import 'dart:convert'; // Import for JSON encoding and decoding
+import 'dart:convert';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
-import 'vehicle.dart'; // Importing the vehicle object
+import 'vehicle.dart';
 import 'add_vehicle.dart';
-import 'edit_vehicle.dart'; // Import the edit vehicle page
+import 'edit_vehicle.dart';
 
 class GaragePage extends StatefulWidget {
   final User? user;
@@ -17,6 +18,7 @@ class GaragePage extends StatefulWidget {
 
 class _GaragePageState extends State<GaragePage> {
   List<Vehicle> _vehicles = [];
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
 
   @override
   void initState() {
@@ -24,9 +26,15 @@ class _GaragePageState extends State<GaragePage> {
     _loadVehicles();
   }
 
-  // Function to load vehicles from shared preferences if user is not logged in
   Future<void> _loadVehicles() async {
-    if (widget.user == null) {
+    if (widget.user != null) {
+      var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
+      var snapshot = await collection.get();
+      var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data() as Map<String, dynamic>..putIfAbsent('uid', () => doc.id))).toList();
+      setState(() {
+        _vehicles = vehicles;
+      });
+    } else {
       final prefs = await SharedPreferences.getInstance();
       final String? vehiclesString = prefs.getString('vehicles');
 
@@ -39,6 +47,38 @@ class _GaragePageState extends State<GaragePage> {
     }
   }
 
+  void _addVehicle(String name, String vinNumber) {
+    if (widget.user != null) {
+      var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
+      collection.add({'name': name, 'vinNumber': vinNumber}).then((docRef) {
+        setState(() {
+          _vehicles.add(Vehicle(uid: docRef.id, name: name, vinNumber: vinNumber));
+        });
+      });
+    } else {
+      setState(() {
+      _vehicles.add(Vehicle(name: name, vinNumber: vinNumber));
+      _saveVehicles();
+    });
+    }
+  }
+
+  void _removeVehicle(int index) {
+    if (widget.user != null) {
+      var docRef = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles').doc(_vehicles[index].uid);
+      docRef.delete().then((_) {
+        setState(() {
+          _vehicles.removeAt(index);
+        });
+      });
+    } else {
+      setState(() {
+      _vehicles.removeAt(index);
+      _saveVehicles();
+    });
+    }
+  }
+
   // Function to save vehicles to shared preferences if user is not logged in
   Future<void> _saveVehicles() async {
     if (widget.user == null) {
@@ -48,26 +88,20 @@ class _GaragePageState extends State<GaragePage> {
     }
   }
 
-  // Function to clear vehicles from shared preferences
-  Future<void> _clearVehicles() async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.remove('vehicles');
-  }
-
-  // Function to add a new vehicle to the list
-  void _addVehicle(String name, String vinNumber) {
-    setState(() {
-      _vehicles.add(Vehicle(name: name, vinNumber: vinNumber));
+  void _editVehicle(int index, String name, String vinNumber) {
+    if (widget.user != null) {
+      var docRef = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles').doc(_vehicles[index].uid);
+      docRef.update({'name': name, 'vinNumber': vinNumber}).then((_) {
+        setState(() {
+          _vehicles[index] = Vehicle(uid: _vehicles[index].uid, name: name, vinNumber: vinNumber);
+        });
+      });
+    } else {
+      setState(() {
+      _vehicles[index] = Vehicle(name: name, vinNumber: vinNumber);
       _saveVehicles();
     });
-  }
-
-  // Function to remove a vehicle from the list
-  void _removeVehicle(int index) {
-    setState(() {
-      _vehicles.removeAt(index);
-      _saveVehicles();
-    });
+    }
   }
 
   @override
@@ -85,19 +119,14 @@ class _GaragePageState extends State<GaragePage> {
                   padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
                   child: GestureDetector(
                     onTap: () {
-                      // Navigate to the EditVehiclePage with the corresponding vehicle details
                       Navigator.push(
                         context,
                         MaterialPageRoute(
                           builder: (context) => EditVehiclePage(
                             name: vehicle.name,
                             vinNumber: vehicle.vinNumber,
-                            editVehicleCallback: (String name, String vinNumber) {
-                              setState(() {
-                                // Update the vehicle details
-                                _vehicles[index] = Vehicle(name: name, vinNumber: vinNumber);
-                                _saveVehicles();
-                              });
+                            editVehicleCallback: (name, vin) {
+                              _editVehicle(index, name, vin);
                             },
                           ),
                         ),
@@ -106,25 +135,23 @@ class _GaragePageState extends State<GaragePage> {
                     child: Stack(
                       children: [
                         Container(
-                          height: 60, // Adjust the height of the vehicle button
+                          height: 60,
                           decoration: BoxDecoration(
                             color: Colors.grey[300],
                             borderRadius: BorderRadius.circular(20.0),
                           ),
                           child: Row(
                             children: [
-                              const SizedBox(width: 20), // Spacing to the left
+                              const SizedBox(width: 20),
                               Text(
                                 vehicle.name,
                                 style: const TextStyle(fontSize: 18.0),
                               ),
-                              const Spacer(), // Pushes the delete button to the right edge
+                              const Spacer(),
                               GestureDetector(
-                                onTap: () {
-                                  _removeVehicle(index);
-                                },
+                                onTap: () => _removeVehicle(index),
                                 child: Container(
-                                  width: 40, // Adjust the size of the delete button
+                                  width: 40,
                                   alignment: Alignment.center,
                                   decoration: const BoxDecoration(
                                     shape: BoxShape.circle,
@@ -137,7 +164,7 @@ class _GaragePageState extends State<GaragePage> {
                                   ),
                                 ),
                               ),
-                              const SizedBox(width: 20), // Spacing between text and delete button
+                              const SizedBox(width: 20),
                             ],
                           ),
                         ),
@@ -147,29 +174,18 @@ class _GaragePageState extends State<GaragePage> {
                 );
               },
             ),
-      floatingActionButton: _vehicles.length < 5
-          ? FloatingActionButton(
-              onPressed: () {
-                // Navigate to the AddVehiclePage
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => AddVehiclePage(addVehicleCallback: _addVehicle),
-                  ),
-                );
-              },
-              child: const Icon(Icons.add),
-            )
-          : FloatingActionButton(
-              onPressed: () {
-                ScaffoldMessenger.of(context).showSnackBar(
-                  const SnackBar(
-                    content: Text('You can only add up to 5 vehicles.'),
-                  ),
-                );
-              },
-              child: const Icon(Icons.add),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddVehiclePage(addVehicleCallback: _addVehicle),
             ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
     );
   }
+
 }
