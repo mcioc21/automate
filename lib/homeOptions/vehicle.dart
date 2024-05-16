@@ -1,28 +1,39 @@
+import 'package:automate/homeOptions/vehicleOptions/fuel_type.dart';
+
 class Vehicle {
   final String? uid;
-  final String name;
+  final String make;
+  final String model;
   final String vinNumber;
+  final FuelType fuelType;
 
   Vehicle({
     this.uid,
-    required this.name,
+    required this.make,
+    required this.model,
     required this.vinNumber,
+    required this.fuelType,
   });
 
   // Convert a map to a Vehicle object
   factory Vehicle.fromMap(Map<String, dynamic> map) {
     return Vehicle(
       uid: map['uid'] ?? '',
-      name: map['name'] ?? '',
+      make: map['make'] ?? '',
+      model: map['model'] ?? '',
       vinNumber: map['vinNumber'] ?? '',
+      fuelType: FuelType.values.byName(map['fuelType'] ?? 'Undefined'), // Default to 'Petrol' if not specified
     );
   }
 
   // Convert a Vehicle object to a map
   Map<String, dynamic> toMap() {
     return {
-      'name': name,
+      'uid': uid,
+      'make': make,
+      'model': model,
       'vinNumber': vinNumber,
+      'fuelType': fuelType.name, // Store the name of the enum value
     };
   }
 
@@ -33,6 +44,6 @@ class Vehicle {
 
   // Convert a list of maps to a list of Vehicles
   static List<Vehicle> fromMapList(List<dynamic> maps) {
-    return maps.map((map) => Vehicle.fromMap(map)).toList();
+    return maps.map((map) => Vehicle.fromMap(map as Map<String, dynamic>)).toList();
   }
 }

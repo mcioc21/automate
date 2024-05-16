@@ -1,4 +1,5 @@
 import 'dart:convert';
+import 'package:automate/homeOptions/vehicleOptions/fuel_type.dart';
 import 'package:automate/otherWidgets/create_account_banner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -45,7 +46,6 @@ class _GaragePageState extends State<GaragePage> {
     } else {
       final prefs = await SharedPreferences.getInstance();
       final String? vehiclesString = prefs.getString('vehicles');
-
       if (vehiclesString != null) {
         final List<dynamic> vehiclesList = jsonDecode(vehiclesString);
         setState(() {
@@ -59,19 +59,19 @@ class _GaragePageState extends State<GaragePage> {
     }
   }
 
-  void _addVehicle(String name, String vinNumber) {
+  void _addVehicle(String make, String model, FuelType fuelType, String vinNumber) {
     if (widget.user != null) {
       var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
-      collection.add({'name': name, 'vinNumber': vinNumber}).then((docRef) {
+      collection.add({'make': make, 'model': model, 'fuelType': fuelType.name, 'vinNumber': vinNumber}).then((docRef) {
         setState(() {
-          _vehicles.add(Vehicle(uid: docRef.id, name: name, vinNumber: vinNumber));
+          _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber));
         });
       });
     } else {
       setState(() {
-      _vehicles.add(Vehicle(name: name, vinNumber: vinNumber));
-      _saveVehicles();
-    });
+        _vehicles.add(Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber));
+        _saveVehicles();
+      });
     }
   }
 
@@ -85,13 +85,12 @@ class _GaragePageState extends State<GaragePage> {
       });
     } else {
       setState(() {
-      _vehicles.removeAt(index);
-      _saveVehicles();
-    });
+        _vehicles.removeAt(index);
+        _saveVehicles();
+      });
     }
   }
 
-  // Function to save vehicles to shared preferences if user is not logged in
   Future<void> _saveVehicles() async {
     if (widget.user == null) {
       final prefs = await SharedPreferences.getInstance();
@@ -100,112 +99,112 @@ class _GaragePageState extends State<GaragePage> {
     }
   }
 
-  void _editVehicle(int index, String name, String vinNumber) {
+  void _editVehicle(int index, String make, String model, FuelType fuelType, String vinNumber) {
     if (widget.user != null) {
       var docRef = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles').doc(_vehicles[index].uid);
-      docRef.update({'name': name, 'vinNumber': vinNumber}).then((_) {
+      docRef.update({'make': make, 'model': model, 'fuelType': fuelType.name, 'vinNumber': vinNumber}).then((_) {
         setState(() {
-          _vehicles[index] = Vehicle(uid: _vehicles[index].uid, name: name, vinNumber: vinNumber);
+          _vehicles[index] = Vehicle(uid: _vehicles[index].uid, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber);
         });
       });
     } else {
       setState(() {
-      _vehicles[index] = Vehicle(name: name, vinNumber: vinNumber);
-      _saveVehicles();
-    });
+        _vehicles[index] = Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber);
+        _saveVehicles();
+      });
     }
   }
 
   @override
-@override
-Widget build(BuildContext context) {
+  Widget build(BuildContext context) {
     return Scaffold(
-        body: _isLoading
-            ? const Center(child: CircularProgressIndicator()) // Show loading indicator while fetching data
-            : Column(
+      body: _isLoading
+          ? const Center(child: CircularProgressIndicator())
+          : Column(
               children: <Widget>[
-                widget.user == null &&  _isWarningVisible ? const AccountWarningBanner() : Container(),
+                widget.user == null && _isWarningVisible ? const AccountWarningBanner() : Container(),
                 Expanded(
-                  child:
-                  _vehicles.isEmpty
-                      ? const Center(child: Text('Add your first vehicle')) // Show this text if no vehicles are present
-                      : ListView.builder( // Show this list if there are vehicles
+                  child: _vehicles.isEmpty
+                      ? const Center(child: Text('Add your first vehicle'))
+                      : ListView.builder(
                           itemCount: _vehicles.length,
                           itemBuilder: (context, index) {
-                              final vehicle = _vehicles[index];
-                              return Padding(
-                                  padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
-                                  child: GestureDetector(
-                                      onTap: () {
-                                          Navigator.push(
-                                              context,
-                                              MaterialPageRoute(
-                                                  builder: (context) => EditVehiclePage(
-                                                      name: vehicle.name,
-                                                      vinNumber: vehicle.vinNumber,
-                                                      editVehicleCallback: (name, vin) {
-                                                          _editVehicle(index, name, vin);
-                                                      },
-                                                  ),
-                                              ),
-                                          );
-                                      },
-                                      child: Stack(
-                                          children: [
-                                              Container(
-                                                  height: 60,
-                                                  decoration: BoxDecoration(
-                                                      color: Colors.grey[300],
-                                                      borderRadius: BorderRadius.circular(20.0),
-                                                  ),
-                                                  child: Row(
-                                                      children: [
-                                                          const SizedBox(width: 20),
-                                                          Text(
-                                                              vehicle.name,
-                                                              style: const TextStyle(fontSize: 18.0),
-                                                          ),
-                                                          const Spacer(),
-                                                          GestureDetector(
-                                                              onTap: () => _removeVehicle(index),
-                                                              child: Container(
-                                                                  width: 40,
-                                                                  alignment: Alignment.center,
-                                                                  decoration: const BoxDecoration(
-                                                                      shape: BoxShape.circle,
-                                                                      color: Colors.red,
-                                                                  ),
-                                                                  child: const Icon(
-                                                                      Icons.close,
-                                                                      color: Colors.white,
-                                                                      size: 24,
-                                                                  ),
-                                                              ),
-                                                          ),
-                                                          const SizedBox(width: 20),
-                                                      ],
-                                                  ),
-                                              ),
-                                          ],
+                            final vehicle = _vehicles[index];
+                            return Padding(
+                              padding: const EdgeInsets.symmetric(vertical: 8.0, horizontal: 16.0),
+                              child: GestureDetector(
+                                onTap: () {
+                                  Navigator.push(
+                                    context,
+                                    MaterialPageRoute(
+                                      builder: (context) => EditVehiclePage(
+                                        make: vehicle.make,
+                                        model: vehicle.model,
+                                        fuelType: vehicle.fuelType,
+                                        vinNumber: vehicle.vinNumber,
+                                        editVehicleCallback: (make, model, fuelType, vin) {
+                                          _editVehicle(index, make, model, fuelType, vin);
+                                        },
                                       ),
-                                  ),
-                              );
+                                    ),
+                                  );
+                                },
+                                child: Stack(
+                                  children: [
+                                    Container(
+                                      height: 60,
+                                      decoration: BoxDecoration(
+                                        color: Colors.grey[300],
+                                        borderRadius: BorderRadius.circular(20.0),
+                                      ),
+                                      child: Row(
+                                        children: [
+                                          const SizedBox(width: 20),
+                                          Text(
+                                            vehicle.make,
+                                            style: const TextStyle(fontSize: 18.0),
+                                          ),
+                                          const Spacer(),
+                                          GestureDetector(
+                                            onTap: () => _removeVehicle(index),
+                                            child: Container(
+                                              width: 40,
+                                              alignment: Alignment.center,
+                                              decoration: const BoxDecoration(
+                                                shape: BoxShape.circle,
+                                                color: Colors.red,
+                                              ),
+                                              child: const Icon(
+                                                Icons.close,
+                                                color: Colors.white,
+                                                size: 24,
+                                              ),
+                                            ),
+                                          ),
+                                          const SizedBox(width: 20),
+                                        ],
+                                      ),
+                                    ),
+                                  ],
+                                ),
+                              ),
+                            );
                           },
-                      ),
-                    ),
+                        ),
+                ),
               ],
             ),
-        floatingActionButton: FloatingActionButton(
-            onPressed: () {
-                Navigator.push(
-                    context,
-                    MaterialPageRoute(
-                        builder: (context) => AddVehiclePage(addVehicleCallback: _addVehicle),
-                    ),
-                );
-            },
-            child: const Icon(Icons.add),
-        ),
+      floatingActionButton: FloatingActionButton(
+        onPressed: () {
+          Navigator.push(
+            context,
+            MaterialPageRoute(
+              builder: (context) => AddVehiclePage(addVehicleCallback: _addVehicle),
+            ),
+          );
+        },
+        child: const Icon(Icons.add),
+      ),
     );
-}
+  }
 }

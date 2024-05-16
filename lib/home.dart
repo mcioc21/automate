@@ -27,7 +27,7 @@ class _MyHomeScreenState extends State<HomeScreen> {
   Widget build(BuildContext context) {
     final user = context.watch<UserProvider>().user; // Access the user from UserProvider
 
-    final List<Widget> _pages = [
+    final List<Widget> pages = [
       HomePage(user: user),  // Pass the user to HomePage
       GaragePage(user: user),  // Pass the user to GaragePage
       ServicesPage(user: user),  // Pass the user to ServicesPage
@@ -42,7 +42,7 @@ class _MyHomeScreenState extends State<HomeScreen> {
         ),
         automaticallyImplyLeading: false,  // Remove the back button
       ),
-      body: _pages[_selectedIndex],
+      body: pages[_selectedIndex],
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

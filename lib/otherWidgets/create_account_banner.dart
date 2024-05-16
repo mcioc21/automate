@@ -5,7 +5,7 @@ import 'package:automate/register.dart';
 class AccountWarningBanner extends StatefulWidget {
   final Function(bool)? onDismiss; // Callback for handling visibility state externally if needed
 
-  const AccountWarningBanner({Key? key, this.onDismiss}) : super(key: key);
+  const AccountWarningBanner({super.key, this.onDismiss});
 
   @override
   _AccountWarningBannerState createState() => _AccountWarningBannerState();
@@ -63,7 +63,7 @@ class _AccountWarningBannerState extends State<AccountWarningBanner> {
                 foregroundColor: MaterialStateProperty.all<Color>(Colors.red),
                 maximumSize: MaterialStateProperty.all<Size>(const Size(double.infinity, 60)),
               ),
-              child: const Text("Create Account"),
+              child: const Text("Create Account", style: TextStyle(fontWeight: FontWeight.bold),)
             ),
           ),
         ],
