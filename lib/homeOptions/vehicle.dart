@@ -22,7 +22,7 @@ class Vehicle {
       make: map['make'] ?? '',
       model: map['model'] ?? '',
       vinNumber: map['vinNumber'] ?? '',
-      fuelType: FuelType.values.byName(map['fuelType'] ?? 'Undefined'), // Default to 'Petrol' if not specified
+      fuelType: FuelType.values.byName(map['fuelType'] ?? 'Petrol'), // Default to 'Petrol' if not specified
     );
   }
 
@@ -33,7 +33,7 @@ class Vehicle {
       'make': make,
       'model': model,
       'vinNumber': vinNumber,
-      'fuelType': fuelType.name, // Store the name of the enum value
+      'fuelType': fuelType.name,
     };
   }
 

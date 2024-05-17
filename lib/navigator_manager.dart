@@ -18,6 +18,15 @@ class NavigationManager {
     Navigator.pushReplacementNamed(context, '/dashboard');
   }
 
+  static void goToHomeWithPage(BuildContext context, {int currentPageIndex = 0}) {
+    Navigator.pushReplacement(
+      context,
+      MaterialPageRoute(
+        builder: (context) => HomeScreen(currentPageIndex: currentPageIndex),
+      ),
+    );
+  }
+
   static void goToLogin(BuildContext context) {
     Navigator.pushReplacementNamed(context, '/login');
   }

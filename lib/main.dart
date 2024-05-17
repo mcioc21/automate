@@ -116,21 +116,21 @@ class ChooseLoginScreen extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      appBar: AppBar(
-        toolbarHeight: 60,
-        title: const ListTile(
-          leading: Text(
-            'Welcome',
-            style: TextStyle(fontSize: 25.0),
-          ),
-          trailing: Icon(
-            Icons.auto_awesome,
-            color: AppColors.blue,
-          ), //add icon here
-        ),
-        backgroundColor: Colors.grey,
-        foregroundColor: AppColors.blue,
-      ),
+      // appBar: AppBar(
+      //   toolbarHeight: 60,
+      //   title: const ListTile(
+      //     leading: Text(
+      //       'Welcome',
+      //       style: TextStyle(fontSize: 25.0),
+      //     ),
+      //     trailing: Icon(
+      //       Icons.auto_awesome,
+      //       color: AppColors.blue,
+      //     ), //add icon here
+      //   ),
+      //   backgroundColor: Colors.grey,
+      //   foregroundColor: AppColors.blue,
+      // ),
       body: Center(
         child: Column(
           mainAxisAlignment: MainAxisAlignment.center,

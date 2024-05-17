@@ -5,5 +5,5 @@ enum FuelType {
   Diesel,
   EV,      // Electric Vehicle
   CNG,   // Compressed Natural Gas
-  Undefined     
+  //Undefined     
 }

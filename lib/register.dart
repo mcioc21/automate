@@ -1,9 +1,12 @@
 import 'package:automate/colors.dart';
+import 'package:automate/navigator_manager.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 
 class RegisterPage extends StatefulWidget {
-  const RegisterPage({super.key});
+  final int currentPageIndex;
+
+  const RegisterPage({super.key, this.currentPageIndex = 0});
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -41,7 +44,7 @@ class _RegisterPageState extends State<RegisterPage> {
 
         // Registration successful, you can navigate to the home page or show a success message
         //print('Registration successful: ${userCredential.user?.email}');
-        Navigator.pushReplacementNamed(context, '/dashboard');
+        NavigationManager.goToHomeWithPage(context, currentPageIndex: widget.currentPageIndex);
       } on FirebaseAuthException catch (e) {
         setState(() {
           _isLoading = false;

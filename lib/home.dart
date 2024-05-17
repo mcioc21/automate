@@ -8,14 +8,24 @@ import 'package:automate/homeOptions/services_page.dart';
 import 'package:automate/user_provider.dart';
 
 class HomeScreen extends StatefulWidget {
-  const HomeScreen({super.key});
+  final int currentPageIndex;
+
+  const HomeScreen({super.key, this.currentPageIndex = 0});
 
   @override
   _MyHomeScreenState createState() => _MyHomeScreenState();
 }
 
 class _MyHomeScreenState extends State<HomeScreen> {
-  int _selectedIndex = 0;
+  late int _selectedIndex;
+
+  final List<String> _titles = ['Home', 'Garage', 'Services', 'Profile'];
+
+  @override
+  void initState() {
+    super.initState();
+    _selectedIndex = widget.currentPageIndex;
+  }
 
   void _onItemTapped(int index) {
     setState(() {
@@ -37,8 +47,8 @@ class _MyHomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Container(
-          padding: const EdgeInsets.only(left: 25.0),  // Adjust this value to move the title further right
-          child: const Text('AutoMate'),
+          padding: const EdgeInsets.only(left: 20.0, top: 20.0),  // Adjust this value to move the title further right
+          child: Text(_titles[_selectedIndex]),
         ),
         automaticallyImplyLeading: false,  // Remove the back button
       ),
