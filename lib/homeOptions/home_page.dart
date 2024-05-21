@@ -1,4 +1,7 @@
-import 'dart:async';
+import 'package:automate/colors.dart';
+import 'package:automate/otherWidgets/homePageButtons/home_page_ad_carousel_slider.dart';
+import 'package:automate/otherWidgets/homePageButtons/home_page_services_button.dart';
+import 'package:automate/otherWidgets/homePageButtons/home_page_top_buttons.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -15,94 +18,102 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   bool _showWelcomeBanner = false;
   bool _showGuestBanner = false;
+  int _userAppointmentState = 0;
+  int _userVehicleState = 0;
 
   @override
   void initState() {
     super.initState();
-    _checkWelcomeBannerStatus();
+    _checkBannerStatus();
+    _determineUserState();
   }
 
-  Future<void> _checkWelcomeBannerStatus() async {
+  Future<void> _checkBannerStatus() async {
     final prefs = await SharedPreferences.getInstance();
-    final hasSeenWelcomeBanner = prefs.getBool('hasSeenWelcomeBanner') ?? false;
-    final hasSeenGuestBanner = prefs.getBool('hasSeenGuestBanner') ?? false;
+    bool hasSeenWelcome = prefs.getBool('hasSeenWelcomeBanner') ?? false;
+    bool hasSeenGuest = prefs.getBool('hasSeenGuestBanner') ?? false;
 
-    if (widget.user != null && !hasSeenWelcomeBanner) {
-      setState(() {
-        _showWelcomeBanner = true;
-      });
-      prefs.setBool('hasSeenWelcomeBanner', true);
-    } else if (widget.user == null && !hasSeenGuestBanner) {
-      setState(() {
-        _showGuestBanner = true;
-      });
-      prefs.setBool('hasSeenGuestBanner', true);
-    }
-
-    Timer(const Duration(seconds: 5), () {
-      setState(() {
-        _showWelcomeBanner = false;
-        _showGuestBanner = false;
-      });
+    setState(() {
+      _showWelcomeBanner = widget.user != null && !hasSeenWelcome;
+      _showGuestBanner = widget.user == null && !hasSeenGuest;
     });
+
+    if (_showWelcomeBanner || _showGuestBanner) {
+      await prefs.setBool('hasSeenWelcomeBanner', true);
+      await prefs.setBool('hasSeenGuestBanner', true);
+    }
+  }
+
+  void _determineUserState() {
+    if (widget.user == null) {
+      _userAppointmentState = 0;
+      _userVehicleState == 0;  // Guest
+    } else {
+      // Placeholder for checking if user has appointments
+
+      bool hasAppointments = false; // TO DO: Replace with actual check
+      _userAppointmentState = hasAppointments ? 2 : 1; 
+      bool hasVehicle = false; // TO DO: Replace with actual check
+      _userVehicleState = hasVehicle ? 2 : 1;
+    }
   }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: Stack(
-        children: [
-          if (_showWelcomeBanner)
-            Positioned(
-              top: 16,
-              left: 16,
-              right: 16,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey, // Color for registered user banner
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                padding: const EdgeInsets.all(12.0),
-                child: const Text(
-                  'Welcome to our app!',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
+      body: SingleChildScrollView(
+        child: Column(
+          children: [
+            if (_showWelcomeBanner || _showGuestBanner)
+              Padding(
+                padding: const EdgeInsets.only(top: 16, bottom: 8, left: 16, right: 16),
+                child: Container(
+                  decoration: BoxDecoration(
+                    color: Colors.grey,
+                    borderRadius: BorderRadius.circular(10),
                   ),
-                  textAlign: TextAlign.center,
+                  padding: const EdgeInsets.all(12),
+                  child: Text(
+                    _showWelcomeBanner ? 'Welcome to our app!' : 'Welcome! Please log in or create an account.',
+                    style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
+                    textAlign: TextAlign.center,
+                  ),
                 ),
               ),
-            ),
-          if (_showGuestBanner)
-            Positioned(
-              top: 16,
-              left: 16,
-              right: 16,
-              child: Container(
-                decoration: BoxDecoration(
-                  color: Colors.grey, // Color for guest user banner
-                  borderRadius: BorderRadius.circular(10.0),
-                ),
-                padding: const EdgeInsets.all(12.0),
-                child: const Text(
-                  'Welcome to our app! Please remember to login/create your account to unlock all the app features!',
-                  style: TextStyle(
-                    fontSize: 16.0,
-                    fontWeight: FontWeight.bold,
-                  ),
-                  textAlign: TextAlign.center,
+            if (!_showWelcomeBanner && !_showGuestBanner)
+              Padding(
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.005,
                 ),
               ),
+            Padding(
+              padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+              child: Row(
+                mainAxisAlignment: MainAxisAlignment.spaceEvenly,
+                children:
+                  [
+                    homePageAppointmentButton(context, _userAppointmentState),
+                    homePageVehicleDetailsButton(context, _userVehicleState),
+                  ]
+              ),
             ),
-          const Center(
-            child: Column(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: <Widget>[
-                // Your other widgets here
-              ],
+          homePageAdCarouselSlider(context),
+          ListTile(
+              title: Container(
+          padding: const EdgeInsets.only(left: 15.0),
+          child: const Text(
+            'Services', 
+            style: TextStyle(fontSize: 25, color: AppColors.blue),),
             ),
           ),
-        ],
+            homePageServicesButton(context, 'Workshops', Icons.build),
+            const SizedBox(height: 5),
+            homePageServicesButton(context, 'Partners', Icons.group),
+            const SizedBox(height: 5),
+            homePageServicesButton(context, 'Discounts', Icons.local_offer),
+          ],
+        ),
       ),
     );
   }

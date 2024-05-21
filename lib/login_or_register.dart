@@ -25,7 +25,7 @@ class LoginOrRegisterPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 100),
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width * 0.65, // 65% of screen width
               height: MediaQuery.of(context).size.height * 0.05, // 5% of screen height
               child: ElevatedButton(
@@ -41,7 +41,7 @@ class LoginOrRegisterPage extends StatelessWidget {
               ),
             ),
             const SizedBox(height: 20),
-            Container(
+            SizedBox(
               width: MediaQuery.of(context).size.width * 0.65, // 65% of screen width
               height: MediaQuery.of(context).size.height * 0.05, // 5% of screen height
               child: ElevatedButton(

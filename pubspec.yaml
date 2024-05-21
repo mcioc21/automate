@@ -14,6 +14,7 @@ dependencies:
   shared_preferences: ^2.0.8
   flutter:
     sdk: flutter
+  carousel_slider: ^4.2.1
 
 dev_dependencies:
   flutter_test:
@@ -23,6 +24,8 @@ dev_dependencies:
 flutter:
   assets:
     - assets/AutoMate.png
+    - assets/placeholder.jpg
+    - assets/placeholder_1.jpg
   uses-material-design: true
   
   
