@@ -1,7 +1,9 @@
 import 'package:automate/colors.dart';
+import 'package:automate/homeOptions/vehicle.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_ad_carousel_slider.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_services_button.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_top_buttons.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:shared_preferences/shared_preferences.dart';
@@ -16,9 +18,11 @@ class HomePage extends StatefulWidget {
 }
 
 class _HomePageState extends State<HomePage> {
+  final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _showWelcomeBanner = false;
   bool _showGuestBanner = false;
   int _userAppointmentState = 0;
+  Vehicle? _vehicle;
   int _userVehicleState = 0;
 
   @override
@@ -44,7 +48,7 @@ class _HomePageState extends State<HomePage> {
     }
   }
 
-  void _determineUserState() {
+  void _determineUserState() async {
     if (widget.user == null) {
       _userAppointmentState = 0;
       _userVehicleState == 0;  // Guest
@@ -53,6 +57,13 @@ class _HomePageState extends State<HomePage> {
 
       bool hasAppointments = false; // TO DO: Replace with actual check
       _userAppointmentState = hasAppointments ? 2 : 1; 
+
+      var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
+      var snapshot = await collection.get();
+      //var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data())).toList();
+      //var vehicle = snapshot.docs.where((element) => false);
+      
+      
       bool hasVehicle = false; // TO DO: Replace with actual check
       _userVehicleState = hasVehicle ? 2 : 1;
     }
@@ -82,7 +93,7 @@ class _HomePageState extends State<HomePage> {
               ),
             if (!_showWelcomeBanner && !_showGuestBanner)
               Padding(
-                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 16),
+                padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.005,
                 ),
@@ -101,7 +112,7 @@ class _HomePageState extends State<HomePage> {
           homePageAdCarouselSlider(context),
           ListTile(
               title: Container(
-          padding: const EdgeInsets.only(left: 15.0),
+          padding: const EdgeInsets.only(left: 15.0, top: 5),
           child: const Text(
             'Services', 
             style: TextStyle(fontSize: 25, color: AppColors.blue),),

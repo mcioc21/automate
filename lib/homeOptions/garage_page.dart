@@ -1,3 +1,4 @@
+// ignore_for_file: avoid_function_literals_in_foreach_calls
 import 'dart:convert';
 import 'package:automate/homeOptions/vehicleOptions/fuel_type.dart';
 import 'package:automate/otherWidgets/create_account_banner.dart';
@@ -59,21 +60,70 @@ class _GaragePageState extends State<GaragePage> {
     }
   }
 
-  void _addVehicle(String make, String model, FuelType fuelType, String vinNumber) {
-    if (widget.user != null) {
-      var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
-      collection.add({'make': make, 'model': model, 'fuelType': fuelType.name, 'vinNumber': vinNumber}).then((docRef) {
-        setState(() {
-          _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber));
-        });
+  void _addVehicle(String make, String model, FuelType fuelType, String vinNumber, bool isDefault) async {
+  if (widget.user != null) {
+    var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
+    var snapshot = await collection.get();
+    var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data()..putIfAbsent('uid', () => doc.id))).toList();
+
+    if (vehicles.isEmpty) {
+      // If no vehicles, directly add as default
+      var docRef = await collection.add({
+        'make': make,
+        'model': model,
+        'fuelType': fuelType.name,
+        'vinNumber': vinNumber,
+        'isDefault': true
+      });
+      setState(() {
+        _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: true));
       });
     } else {
-      setState(() {
-        _vehicles.add(Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber));
-        _saveVehicles();
-      });
+      if (isDefault) {
+        // Unset all other defaults first
+        List<Future> updates = vehicles.where((v) => v.isDefault).map((vehicle) {
+          return collection.doc(vehicle.uid).update({'isDefault': false});
+        }).toList();
+
+        await Future.wait(updates); // Ensure all updates complete before proceeding
+
+        // After unsetting defaults, add the new default vehicle
+        var docRef = await collection.add({
+          'make': make,
+          'model': model,
+          'fuelType': fuelType.name,
+          'vinNumber': vinNumber,
+          'isDefault': true
+        });
+        setState(() {
+          vehicles.forEach((v) {
+            v.isDefault = false; // Update local list state
+          });
+          _vehicles = vehicles;
+          _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: true));
+        });
+      } else {
+        // Add non-default vehicle
+        var docRef = await collection.add({
+          'make': make,
+          'model': model,
+          'fuelType': fuelType.name,
+          'vinNumber': vinNumber,
+          'isDefault': false
+        });
+        setState(() {
+          _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: false));
+        });
+      }
     }
+  } else {
+    // Local storage handling for non-authenticated users
+    setState(() {
+      _vehicles.add(Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: _vehicles.isEmpty));
+      _saveVehicles();
+    });
   }
+}
 
   void _removeVehicle(int index) {
     if (widget.user != null) {
@@ -99,21 +149,54 @@ class _GaragePageState extends State<GaragePage> {
     }
   }
 
-  void _editVehicle(int index, String make, String model, FuelType fuelType, String vinNumber) {
-    if (widget.user != null) {
-      var docRef = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles').doc(_vehicles[index].uid);
-      docRef.update({'make': make, 'model': model, 'fuelType': fuelType.name, 'vinNumber': vinNumber}).then((_) {
-        setState(() {
-          _vehicles[index] = Vehicle(uid: _vehicles[index].uid, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber);
-        });
-      });
-    } else {
+  void _editVehicle(int index, String make, String model, FuelType fuelType, String vinNumber, bool isDefault) async {
+  if (widget.user != null) {
+    var docRef = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles').doc(_vehicles[index].uid);
+
+    if (isDefault) {
+      // Unset all other defaults first if this vehicle is to be set as default
+      var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
+      var snapshot = await collection.get();
+      var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data()..putIfAbsent('uid', () => doc.id))).toList();
+
+      List<Future> updates = vehicles.where((v) => v.isDefault).map((vehicle) {
+        return collection.doc(vehicle.uid).update({'isDefault': false});
+      }).toList();
+
+      await Future.wait(updates); // Ensure all updates complete before proceeding
+
       setState(() {
-        _vehicles[index] = Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber);
-        _saveVehicles();
-      });
+          vehicles.forEach((v) {
+            v.isDefault = false; // Update local list state
+          });
+          _vehicles = vehicles;
+        });
     }
+    await docRef.update({
+        'make': make,
+        'model': model,
+        'fuelType': fuelType.name,
+        'vinNumber': vinNumber,
+        'isDefault': isDefault
+      });
+
+    // Update local state
+    setState(() {
+      _vehicles[index] = Vehicle(uid: _vehicles[index].uid, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: isDefault);
+    });
+
+  } else {
+    // Handle local storage for non-authenticated users
+    setState(() {
+      if (isDefault) {
+        // Make sure only one default vehicle exists
+        _vehicles.forEach((v) => v.isDefault = false);
+      }
+      _vehicles[index] = Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: isDefault);
+      _saveVehicles();
+    });
   }
+}
 
   @override
   Widget build(BuildContext context) {
@@ -142,8 +225,9 @@ class _GaragePageState extends State<GaragePage> {
                                         model: vehicle.model,
                                         fuelType: vehicle.fuelType,
                                         vinNumber: vehicle.vinNumber,
-                                        editVehicleCallback: (make, model, fuelType, vin) {
-                                          _editVehicle(index, make, model, fuelType, vin);
+                                        isDefault: vehicle.isDefault,
+                                        editVehicleCallback: (make, model, fuelType, vin, isDefault) {
+                                          _editVehicle(index, make, model, fuelType, vin, isDefault);
                                         },
                                       ),
                                     ),
@@ -194,17 +278,29 @@ class _GaragePageState extends State<GaragePage> {
                 ),
               ],
             ),
-      floatingActionButton: FloatingActionButton(
-        onPressed: () {
-          Navigator.push(
-            context,
-            MaterialPageRoute(
-              builder: (context) => AddVehiclePage(addVehicleCallback: _addVehicle),
+      floatingActionButton: _vehicles.length < 5
+          ? FloatingActionButton(
+              onPressed: () {
+                // Navigate to the AddVehiclePage
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => AddVehiclePage(addVehicleCallback: _addVehicle, isFirstVehicle: _vehicles.isEmpty),
+                  ),
+                );
+              },
+              child: const Icon(Icons.add),
+            )
+          : FloatingActionButton(
+              onPressed: () {
+                ScaffoldMessenger.of(context).showSnackBar(
+                  const SnackBar(
+                    content: Text('You can only add up to 5 vehicles.'),
+                  ),
+                );
+              },
+              child: const Icon(Icons.add),
             ),
-          );
-        },
-        child: const Icon(Icons.add),
-      ),
     );
   }
 }

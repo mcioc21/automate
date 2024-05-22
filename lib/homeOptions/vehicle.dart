@@ -6,6 +6,7 @@ class Vehicle {
   final String model;
   final String vinNumber;
   final FuelType fuelType;
+  bool isDefault; // New attribute for default status
 
   Vehicle({
     this.uid,
@@ -13,6 +14,7 @@ class Vehicle {
     required this.model,
     required this.vinNumber,
     required this.fuelType,
+    this.isDefault = false, // Default value for isDefault
   });
 
   // Convert a map to a Vehicle object
@@ -23,6 +25,7 @@ class Vehicle {
       model: map['model'] ?? '',
       vinNumber: map['vinNumber'] ?? '',
       fuelType: FuelType.values.byName(map['fuelType'] ?? 'Petrol'), // Default to 'Petrol' if not specified
+      isDefault: map['isDefault'] ?? false, // Default to false if not specified
     );
   }
 
@@ -34,6 +37,7 @@ class Vehicle {
       'model': model,
       'vinNumber': vinNumber,
       'fuelType': fuelType.name,
+      'isDefault': isDefault, // Include isDefault in the map
     };
   }
 

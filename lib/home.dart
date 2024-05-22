@@ -47,7 +47,7 @@ class _MyHomeScreenState extends State<HomeScreen> {
     return Scaffold(
       appBar: AppBar(
         title: Container(
-          padding: const EdgeInsets.only(left: 20.0, top: 30.0),  // Adjust this value to move the title further right
+          padding: const EdgeInsets.only(left: 20.0, top: 30.0, bottom: 10),  // Adjust this value to move the title further right
           child: Text(_titles[_selectedIndex], style: const TextStyle(fontSize: 33, fontWeight: FontWeight.bold), overflow: TextOverflow.visible,),
         ),
         automaticallyImplyLeading: false,  // Remove the back button
