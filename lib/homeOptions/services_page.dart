@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:automate/colors.dart';
+import 'package:automate/app_theme.dart';
 import 'package:automate/homeOptions/choose_workshop.dart';
 import 'package:automate/login_or_register.dart';
 

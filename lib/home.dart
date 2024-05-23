@@ -1,6 +1,6 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:automate/colors.dart';
+import 'package:automate/app_theme.dart';
 import 'package:automate/homeOptions/home_page.dart';
 import 'package:automate/homeOptions/garage_page.dart';
 import 'package:automate/homeOptions/profile_page.dart';

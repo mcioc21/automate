@@ -1,4 +1,4 @@
-import 'package:automate/colors.dart';
+import 'package:automate/app_theme.dart';
 import 'package:automate/homeOptions/vehicle.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_ad_carousel_slider.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_services_button.dart';

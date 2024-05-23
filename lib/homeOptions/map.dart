@@ -9,13 +9,17 @@ class MapPage extends StatefulWidget {
 }
 
 class _MapPageState extends State<MapPage> {
-  late GoogleMapController mapController;
+  late GoogleMapController? mapController;
+  bool _mapLoading = true;
 
   final LatLng _center =
       const LatLng(44.43111, 26.10083); // Example coordinates
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
+    setState(() {
+      _mapLoading = false;
+    });
   }
 
   @override
@@ -43,13 +47,21 @@ class _MapPageState extends State<MapPage> {
                 child: SizedBox(
                   height: MediaQuery.of(context).size.height * 0.43, // Height of the map
                   width: MediaQuery.of(context).size.width * 0.95, // Width of the map
-                  child: GoogleMap(
+                  child: 
+                  Stack(
+                  children: [
+                    GoogleMap(
                     zoomControlsEnabled: true,
                     onMapCreated: _onMapCreated,
                     initialCameraPosition: CameraPosition(
                       target: _center,
                       zoom: 11.0,
                     ),
+                  ),
+                  (_mapLoading)
+                      ? const Center(child: CircularProgressIndicator())
+                      : Container(),
+                  ],
                   ),
                 ),
               ),

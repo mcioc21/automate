@@ -44,7 +44,7 @@ class AppTheme {
       visualDensity: VisualDensity.adaptivePlatformDensity,
       pageTransitionsTheme: const PageTransitionsTheme(
       builders: {
-        TargetPlatform.android: FadePageTransitionsBuilder(),
+        TargetPlatform.android: SlidePageTransitionsBuilder(),
         TargetPlatform.iOS: FadePageTransitionsBuilder(),
       },
     ),
@@ -64,5 +64,30 @@ class FadePageTransitionsBuilder extends PageTransitionsBuilder {
     Widget child,
   ) {
     return FadeTransition(opacity: animation, child: child);
+  }
+}
+
+class SlidePageTransitionsBuilder extends PageTransitionsBuilder {
+  const SlidePageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    var begin = Offset(1.0, 0.0); // Slide from right
+    var end = Offset.zero;
+    var curve = Curves.ease;
+
+    var tween = Tween(begin: begin, end: end).chain(CurveTween(curve: curve));
+    var offsetAnimation = animation.drive(tween);
+
+    return SlideTransition(
+      position: offsetAnimation,
+      child: child,
+    );
   }
 }
