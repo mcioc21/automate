@@ -11,7 +11,8 @@ class MapPage extends StatefulWidget {
 class _MapPageState extends State<MapPage> {
   late GoogleMapController mapController;
 
-  final LatLng _center = const LatLng(45.521563, -122.677433); // Example coordinates
+  final LatLng _center =
+      const LatLng(44.43111, 26.10083); // Example coordinates
 
   void _onMapCreated(GoogleMapController controller) {
     mapController = controller;
@@ -21,23 +22,40 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Google Maps"),
-      ),
-      body: Center(
-        child: ClipRRect(
-          borderRadius: BorderRadius.circular(20.0), // Rounded corners
-          child: SizedBox(
-            height: 300, // Height of the map
-            width: 300, // Width of the map
-            child: GoogleMap(
-              onMapCreated: _onMapCreated,
-              initialCameraPosition: CameraPosition(
-                target: _center,
-                zoom: 11.0,
-              ),
-            ),
+        title: const Text("Workshops Maps", style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 25.0),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
           ),
         ),
+      ),
+      body: Column(
+        children: [
+          Row(
+            mainAxisAlignment: MainAxisAlignment.center,
+            children: [
+              ClipRRect(
+                borderRadius: BorderRadius.circular(20.0), // Rounded corners
+                child: SizedBox(
+                  height: MediaQuery.of(context).size.height * 0.43, // Height of the map
+                  width: MediaQuery.of(context).size.width * 0.95, // Width of the map
+                  child: GoogleMap(
+                    zoomControlsEnabled: true,
+                    onMapCreated: _onMapCreated,
+                    initialCameraPosition: CameraPosition(
+                      target: _center,
+                      zoom: 11.0,
+                    ),
+                  ),
+                ),
+              ),
+            ],
+          ),
+        ],
       ),
     );
   }
