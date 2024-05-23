@@ -52,7 +52,10 @@ class _MyHomeScreenState extends State<HomeScreen> {
         ),
         automaticallyImplyLeading: false,  // Remove the back button
       ),
-      body: pages[_selectedIndex],
+      body: IndexedStack(
+        index: _selectedIndex,
+        children: pages,
+      ),
       bottomNavigationBar: BottomNavigationBar(
         items: const <BottomNavigationBarItem>[
           BottomNavigationBarItem(

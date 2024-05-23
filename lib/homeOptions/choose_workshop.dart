@@ -1,4 +1,5 @@
 import 'package:automate/colors.dart';
+import 'package:automate/homeOptions/map.dart';
 import 'package:flutter/material.dart';
 
 class ChooseWorkshopPage extends StatelessWidget {
@@ -8,7 +9,17 @@ class ChooseWorkshopPage extends StatelessWidget {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Workshop Category"),
+        title: const Text("Choose Workshop",
+            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
+        leading: Padding(
+          padding: const EdgeInsets.only(left: 25.0),
+          child: IconButton(
+            icon: const Icon(Icons.arrow_back),
+            onPressed: () {
+              Navigator.of(context).pop();
+            },
+          ),
+        ),
       ),
       body: Column(
         mainAxisAlignment: MainAxisAlignment.center,
@@ -19,19 +30,20 @@ class ChooseWorkshopPage extends StatelessWidget {
             children: [
               Padding(
                 padding: EdgeInsets.all(16.0),
-                child: Text("Pick a category:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
+                child: Text("Pick a category:",
+                    style:
+                        TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
               ),
             ],
           ),
-          // const Padding(
-          //   padding: EdgeInsets.all(16.0),
-          //   child: Text("Pick a category:", style: TextStyle(fontSize: 20, fontWeight: FontWeight.bold)),
-          // ),
           WorkshopButton(
             title: "Repair Shop",
             description: "General service shops for all types of repair.",
             onPressed: () {
-              // Handle navigation or action for Repair Shop
+              Navigator.push(
+                context,
+                MaterialPageRoute(builder: (context) => const MapPage()),
+              );
             },
           ),
           WorkshopButton(
@@ -73,7 +85,8 @@ class WorkshopButton extends StatelessWidget {
       child: ElevatedButton(
         onPressed: onPressed,
         style: ElevatedButton.styleFrom(
-          foregroundColor: AppColors.snow, backgroundColor: AppColors.blue, // Text color
+          foregroundColor: AppColors.snow,
+          backgroundColor: AppColors.blue, // Text color
           padding: const EdgeInsets.symmetric(vertical: 12.0),
           shape: RoundedRectangleBorder(
             borderRadius: BorderRadius.circular(10.0),
@@ -81,9 +94,12 @@ class WorkshopButton extends StatelessWidget {
         ),
         child: Column(
           children: [
-            Text(title, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
+            Text(title,
+                style:
+                    const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
             const SizedBox(height: 4),
-            Text(description, style: const TextStyle(fontSize: 14, color: Colors.amber)),
+            Text(description,
+                style: const TextStyle(fontSize: 14, color: Colors.amber)),
           ],
         ),
       ),

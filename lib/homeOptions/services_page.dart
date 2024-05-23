@@ -12,7 +12,19 @@ class ServicesPage extends StatelessWidget {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
-      body: user == null ? const LoginOrRegisterPage(currentPageIndex: 2,) : _buildServiceButtons(context),
+      body: user == null ? const LoginOrRegisterPage(currentPageIndex: 2,) 
+      : Navigator(
+              onGenerateRoute: (settings) {
+                return MaterialPageRoute(
+                  builder: (context) {
+                    if (settings.name == 'chooseWorkshop') {
+                      return const ChooseWorkshopPage();
+                    }
+                    return _buildServiceButtons(context); // Default page
+                  },
+                );
+              },
+            ),
     );
   }
 
@@ -32,12 +44,7 @@ class ServicesPage extends StatelessWidget {
               description: 'Find and book workshops',
               icon: Icons.build,
               onTap: () {
-                Navigator.push(
-                  context,
-                  MaterialPageRoute(
-                    builder: (context) => const ChooseWorkshopPage(),
-                  ),
-                );
+                Navigator.of(context).pushNamed('chooseWorkshop');
               },
             ),
             _buildServiceButton(

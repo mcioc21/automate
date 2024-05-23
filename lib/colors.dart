@@ -41,6 +41,28 @@ class AppTheme {
         ),
       ),
       scaffoldBackgroundColor: AppColors.snow,
+      visualDensity: VisualDensity.adaptivePlatformDensity,
+      pageTransitionsTheme: const PageTransitionsTheme(
+      builders: {
+        TargetPlatform.android: FadePageTransitionsBuilder(),
+        TargetPlatform.iOS: FadePageTransitionsBuilder(),
+      },
+    ),
     );
+  }
+}
+
+class FadePageTransitionsBuilder extends PageTransitionsBuilder {
+  const FadePageTransitionsBuilder();
+
+  @override
+  Widget buildTransitions<T>(
+    PageRoute<T> route,
+    BuildContext context,
+    Animation<double> animation,
+    Animation<double> secondaryAnimation,
+    Widget child,
+  ) {
+    return FadeTransition(opacity: animation, child: child);
   }
 }

@@ -15,6 +15,12 @@ if (localPropertiesFile.exists()) {
     }
 }
 
+def keysProperties = new Properties()
+def keysPropertiesFile = rootProject.file('keys.properties')
+if (keysPropertiesFile.exists()) {
+    keysProperties.load(new FileInputStream(keysPropertiesFile))
+}
+
 def flutterVersionCode = localProperties.getProperty('flutter.versionCode')
 if (flutterVersionCode == null) {
     flutterVersionCode = '1'
@@ -48,11 +54,16 @@ android {
         applicationId "com.example.auto_mate"
         // You can update the following values to match your application needs.
         // For more information, see: https://docs.flutter.dev/deployment/android#reviewing-the-gradle-build-configuration.
-        minSdkVersion 19
+        minSdkVersion 20
         targetSdkVersion flutter.targetSdkVersion
         versionCode flutterVersionCode.toInteger()
         versionName flutterVersionName
         multiDexEnabled true
+
+        // Adding the API key to the build config
+        if (keysProperties.containsKey('MAPS_API_KEY')) {
+            resValue 'string', 'google_maps_key', keysProperties['MAPS_API_KEY']
+        }
     }
 
     buildTypes {
