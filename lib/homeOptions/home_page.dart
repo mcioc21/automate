@@ -58,8 +58,8 @@ class _HomePageState extends State<HomePage> {
       bool hasAppointments = false; // TO DO: Replace with actual check
       _userAppointmentState = hasAppointments ? 2 : 1; 
 
-      var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
-      var snapshot = await collection.get();
+      // var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
+      // var snapshot = await collection.get();
       //var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data())).toList();
       //var vehicle = snapshot.docs.where((element) => false);
       
