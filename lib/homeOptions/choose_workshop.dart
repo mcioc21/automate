@@ -7,6 +7,16 @@ class ChooseWorkshopPage extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
+
+    void navigateToMap(String category) {
+      Navigator.push(
+        context,
+        MaterialPageRoute(
+          builder: (context) => MapPage(category: category),
+        ),
+      );
+    }
+
     return Scaffold(
       appBar: AppBar(
         title: const Text("Choose Workshop",
@@ -39,26 +49,17 @@ class ChooseWorkshopPage extends StatelessWidget {
           WorkshopButton(
             title: "Repair Shop",
             description: "General service shops for all types of repair.",
-            onPressed: () {
-              Navigator.push(
-                context,
-                MaterialPageRoute(builder: (context) => const MapPage()),
-              );
-            },
+            onPressed: () => navigateToMap("repair"),
           ),
           WorkshopButton(
             title: "Detailing",
             description: "Specialized in detailing and cosmetic services.",
-            onPressed: () {
-              // Handle navigation or action for Detailing Shop
-            },
+            onPressed: () => navigateToMap("detailing"),
           ),
           WorkshopButton(
             title: "Tyre Shop",
             description: "Focused on tyres and wheel services.",
-            onPressed: () {
-              // Handle navigation or action for Tyre Shop
-            },
+            onPressed: () => navigateToMap("tyre"),
           ),
         ],
       ),

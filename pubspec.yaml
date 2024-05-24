@@ -29,6 +29,10 @@ flutter:
     - assets/AutoMate.png
     - assets/placeholder.jpg
     - assets/placeholder_1.jpg
+    - assets/repair_shop.jpg
+    - assets/detailing_shop.jpg
+    - assets/tyre_shop.jpg
+    - assets/workshops.json
   uses-material-design: true
   
   

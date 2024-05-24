@@ -1,0 +1,83 @@
+[
+  {
+    "id": 1,
+    "latitude": 44.45026,
+    "longitude": 26.114307,
+    "name": "General Repair Shop",
+    "description": "Full service mechanical and bodywork repairs.",
+    "photo": "assets/repair_shop.jpg",
+    "category": "repair"
+  },
+  {
+    "id": 2,
+    "latitude": 44.42982,
+    "longitude": 26.12961,
+    "name": "Detailing Magic",
+    "description": "High-end detailing and cosmetic care.",
+    "photo": "assets/detailing_shop.jpg",
+    "category": "detailing"
+  },
+  {
+    "id": 3,
+    "latitude": 44.39317,
+    "longitude": 26.11158,
+    "name": "Tyre Specialists",
+    "description": "Tyre changes and wheel alignments.",
+    "photo": "assets/tyre_shop.jpg",
+    "category": "tyre"
+  },
+  {
+    "id": 4,
+    "latitude": 44.43789,
+    "longitude": 26.04942,
+    "name": "AutoFix Center",
+    "description": "Comprehensive vehicle repairs and maintenance.",
+    "photo": "assets/repair_shop_2.jpg",
+    "category": "repair"
+  },
+  {
+    "id": 5,
+    "latitude": 44.45679,
+    "longitude": 26.08564,
+    "name": "Mechanics Hub",
+    "description": "Expert mechanical services and diagnostics.",
+    "photo": "assets/repair_shop_3.jpg",
+    "category": "repair"
+  },
+  {
+    "id": 6,
+    "latitude": 44.43215,
+    "longitude": 26.14052,
+    "name": "Shine Detailers",
+    "description": "Specialist in protective coatings and vehicle beautification.",
+    "photo": "assets/detailing_shop_2.jpg",
+    "category": "detailing"
+  },
+  {
+    "id": 7,
+    "latitude": 44.41957,
+    "longitude": 26.12676,
+    "name": "Luxury Detailing Studio",
+    "description": "Luxury auto detailing for exclusive clients.",
+    "photo": "assets/detailing_shop_3.jpg",
+    "category": "detailing"
+  },
+  {
+    "id": 8,
+    "latitude": 44.40523,
+    "longitude": 26.10930,
+    "name": "Quick Tyre Fix",
+    "description": "Fast and reliable tyre services for all car models.",
+    "photo": "assets/tyre_shop_2.jpg",
+    "category": "tyre"
+  },
+  {
+    "id": 9,
+    "latitude": 44.43871,
+    "longitude": 26.09876,
+    "name": "Wheel Care Specialists",
+    "description": "Professional wheel care and tyre installation.",
+    "photo": "assets/tyre_shop_3.jpg",
+    "category": "tyre"
+  }
+]
