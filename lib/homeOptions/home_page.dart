@@ -10,8 +10,9 @@ import 'package:shared_preferences/shared_preferences.dart';
 
 class HomePage extends StatefulWidget {
   final User? user;
+  final void Function(String) onNavigateToServices;
 
-  const HomePage({super.key, this.user});
+  const HomePage({super.key, this.user, required this.onNavigateToServices});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -118,11 +119,11 @@ class _HomePageState extends State<HomePage> {
             style: TextStyle(fontSize: 25, color: AppColors.blue),),
             ),
           ),
-            homePageServicesButton(context, 'Workshops', Icons.build),
+            homePageServicesButton(context, 'Workshops', Icons.build, widget.onNavigateToServices),
             const SizedBox(height: 5),
-            homePageServicesButton(context, 'Partners', Icons.group),
+            homePageServicesButton(context, 'Partners', Icons.group, widget.onNavigateToServices),
             const SizedBox(height: 5),
-            homePageServicesButton(context, 'Discounts', Icons.local_offer),
+            homePageServicesButton(context, 'Discounts', Icons.local_offer, widget.onNavigateToServices),
           ],
         ),
       ),
