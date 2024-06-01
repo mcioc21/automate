@@ -3,15 +3,15 @@ import 'package:flutter/material.dart';
 
 // Adding a navigation function parameter
 Widget homePageServicesButton(
-    BuildContext context, String title, IconData icon, void Function(String) navigateToServices) {
+    BuildContext context, String title, IconData icon, void Function(String)? navigateToServices) {
   return ElevatedButton.icon(
     onPressed: () {
       if (title == 'Workshops') {
-        navigateToServices.call('chooseWorkshop'); // Call the navigation function
+        navigateToServices?.call('chooseWorkshop'); // Call the navigation function
       } else if (title == 'Partners') {
-        navigateToServices.call('choosePartner'); // Call the navigation function
+        navigateToServices?.call('choosePartner'); // Call the navigation function
       } else if (title == 'Discounts') {
-        navigateToServices.call('chooseDiscount'); // Call the navigation function
+        navigateToServices?.call('chooseDiscount'); // Call the navigation function
       }
     },
     icon: Icon(icon),

@@ -1,24 +1,38 @@
 import 'package:automate/homeOptions/choose_discount.dart';
 import 'package:automate/homeOptions/choose_partner.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 import 'package:automate/app_theme.dart';
 import 'package:automate/homeOptions/choose_workshop.dart';
 import 'package:automate/login_or_register.dart';
+import 'package:automate/user_provider.dart';
 
-class ServicesPage extends StatelessWidget {
-  final User? user;
+class ServicesPage extends StatefulWidget {
   final GlobalKey<NavigatorState>? navigatorKey;
 
-  const ServicesPage({super.key, this.user, this.navigatorKey});
+  const ServicesPage({super.key, this.navigatorKey});
 
   @override
+  _ServicesPageState createState() => _ServicesPageState();
+}
+
+class _ServicesPageState extends State<ServicesPage> {
+  @override
   Widget build(BuildContext context) {
+    final user = context.watch<UserProvider>().user;
+
     return Scaffold(
       body: user == null
-          ? const LoginOrRegisterPage(currentPageIndex: 2)
+          ? LoginOrRegisterPage(onLoginSuccess: () => {setState(() {
+            // Refresh the page
+          })})
           : Navigator(
-              key: navigatorKey,
+              key: widget.navigatorKey,
+              onGenerateInitialRoutes: (navigator, initialRoute) {
+                return [
+                  MaterialPageRoute(builder: (context) => _buildServiceButtons(context)),
+                ];
+              },
               onGenerateRoute: (RouteSettings settings) {
                 switch (settings.name) {
                   case 'chooseWorkshop':
@@ -55,7 +69,9 @@ class ServicesPage extends StatelessWidget {
               description: 'Find and book workshops',
               icon: Icons.build,
               onTap: () {
-                Navigator.of(context).pushNamed('chooseWorkshop');
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const ChooseWorkshopPage(),
+                ));
               },
             ),
             _buildServiceButton(
@@ -73,7 +89,9 @@ class ServicesPage extends StatelessWidget {
               description: 'View our partners',
               icon: Icons.group,
               onTap: () {
-                Navigator.of(context).pushNamed('choosePartner');
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const PartnersPage(),
+                ));
               },
             ),
             _buildServiceButton(
@@ -82,7 +100,9 @@ class ServicesPage extends StatelessWidget {
               description: 'Check out discounts',
               icon: Icons.local_offer,
               onTap: () {
-                Navigator.of(context).pushNamed('chooseDiscount');
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const DiscountsPage(),
+                ));
               },
             ),
           ],
@@ -119,8 +139,7 @@ class ServicesPage extends StatelessWidget {
             Icon(icon, size: 35, color: AppColors.blue),
             const SizedBox(height: 10),
             Text(label,
-                style:
-                    const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
+                style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold)),
             const SizedBox(height: 5),
             Text(
               description,

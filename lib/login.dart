@@ -1,13 +1,14 @@
-import 'package:automate/app_theme.dart';
-import 'package:automate/navigator_manager.dart';
-import 'package:automate/register.dart';
 import 'package:flutter/material.dart';
+import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:automate/app_theme.dart';
+import 'package:automate/user_provider.dart';
+import 'package:automate/register.dart';
 
 class LoginPage extends StatefulWidget {
-  final int currentPageIndex;
+  final VoidCallback? onLoginSuccess;
 
-  const LoginPage({super.key, this.currentPageIndex = 0});
+  const LoginPage({super.key, this.onLoginSuccess});
 
   @override
   _LoginPageState createState() => _LoginPageState();
@@ -20,26 +21,23 @@ class _LoginPageState extends State<LoginPage> {
   bool _isLoading = false;
   String _error = '';
 
-  void _login() async {
-    if (_formKey.currentState?.validate() ?? false) {
-      setState(() {
-        _isLoading = true;
-        _error = '';
-      });
-
+  void _login(BuildContext context) async {
+    if (_formKey.currentState!.validate()) {
+      setState(() => _isLoading = true);
       try {
-        await FirebaseAuth.instance.signInWithEmailAndPassword(
+        UserCredential userCredential = await FirebaseAuth.instance.signInWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
-        NavigationManager.goToHomeWithPage(context, currentPageIndex: widget.currentPageIndex);
+        Provider.of<UserProvider>(context, listen: false).setUser(userCredential.user);
+        Navigator.of(context).popUntil((route) => route.isFirst);  // Assuming you want to pop the login screen on successful login
+        widget.onLoginSuccess?.call();
       } on FirebaseAuthException catch (e) {
-        setState(() {
-          _isLoading = false;
-          _error = e.message!;
-        });
+        _error = e.message ?? 'Login failed';
+        ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text(_error)));
+        setState(() => _isLoading = false);
       }
-    }
+    } else {return;}
   }
 
   @override
@@ -77,7 +75,7 @@ class _LoginPageState extends State<LoginPage> {
                 ),
                 const SizedBox(height: 16.0),
                 ElevatedButton(
-                  onPressed: _isLoading ? null : _login,
+                  onPressed: _isLoading ? null : () => _login(context),
                   child: _isLoading ? const CircularProgressIndicator() : const Text('Login', style: TextStyle(color: AppColors.snow)),
                 ),
                 if (_error.isNotEmpty)
@@ -91,13 +89,13 @@ class _LoginPageState extends State<LoginPage> {
                 TextButton(
                   onPressed: _isLoading
                       ? null
-                      : () => {
+                      : () {
                             Navigator.push(
                               context,
                               MaterialPageRoute(
-                                builder: (context) => RegisterPage(currentPageIndex: widget.currentPageIndex),
+                                builder: (context) => const RegisterPage(),
                               ),
-                            )
+                            );
                           },
                   child: const Text(
                     'Don\'t have an account? Register',
@@ -112,4 +110,3 @@ class _LoginPageState extends State<LoginPage> {
     );
   }
 }
-

@@ -1,27 +1,15 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:automate/app_theme.dart';
 import 'package:automate/home.dart';
 import 'package:automate/login.dart';
 import 'package:automate/register.dart';
 import 'package:provider/provider.dart';
 import 'package:automate/user_provider.dart';
-import 'package:shared_preferences/shared_preferences.dart';
-import 'package:google_maps_flutter_android/google_maps_flutter_android.dart';
-import 'package:google_maps_flutter_platform_interface/google_maps_flutter_platform_interface.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();
   await Firebase.initializeApp();
-
-  //this is to fix the issue with the map showing a black screen on specific SDK versions
-  //set to false if needed to change to FadePageTransition in app_theme.dart
-  final GoogleMapsFlutterPlatform mapsImplementation =
-      GoogleMapsFlutterPlatform.instance;
-  if (mapsImplementation is GoogleMapsFlutterAndroid) {
-    mapsImplementation.useAndroidViewSurface = true;
-  }
 
   runApp(
     ChangeNotifierProvider(
@@ -31,83 +19,33 @@ void main() async {
   );
 }
 
-class MainApp extends StatefulWidget {
+class MainApp extends StatelessWidget {
   const MainApp({super.key});
 
   @override
-  _MainAppState createState() => _MainAppState();
-}
-
-class _MainAppState extends State<MainApp> {
-  late Stream<User?> _idTokenStream;
-  User? _user;
-  bool _isGuest = false;
-  bool _initialized = false;
-
-  @override
-  void initState() {
-    super.initState();
-    _initializeApp();
-  }
-
-  Future<void> _initializeApp() async {
-    final prefs = await SharedPreferences.getInstance();
-
-    _idTokenStream = FirebaseAuth.instance.idTokenChanges();
-
-    _idTokenStream.listen((user) {
-      setState(() {
-        _user = user;
-        context.read<UserProvider>().setUser(user);
-        if (user == null) {
-          _isGuest = prefs.getBool('isGuest') ?? false;
-        } else {
-          _isGuest = false;
-        }
-      });
-    }, onError: (error) {
-    });
-
-    setState(() {
-      _initialized = true;
-    });
-  }
-
-  @override
   Widget build(BuildContext context) {
-    if (!_initialized) {
-      return const MaterialApp(
-        home: Scaffold(
-          body: Center(
-            child: CircularProgressIndicator(),
-          ),
-        ),
-      );
-    } else {
-      if (_user == null && !_isGuest) {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.theme,
-          home: const ChooseLoginScreen(),
-          routes: {
-            '/login': (context) => const LoginPage(),
-            '/register': (context) => const RegisterPage(),
-            '/dashboard': (context) => const HomeScreen(),
-          },
-        );
-      } else {
-        return MaterialApp(
-          debugShowCheckedModeBanner: false,
-          theme: AppTheme.theme,
-          home: const HomeScreen(),
-          routes: {
-            '/login': (context) => const LoginPage(),
-            '/register': (context) => const RegisterPage(),
-            '/dashboard': (context) => const HomeScreen(),
-          },
-        );
-      }
-    }
+    return Consumer<UserProvider>(
+      builder: (context, userProvider, child) {
+        if (!userProvider.initialized) {
+          return const MaterialApp(
+            home: Scaffold(
+              body: Center(child: CircularProgressIndicator()),
+            ),
+          );
+        } else {
+          return MaterialApp(
+            debugShowCheckedModeBanner: false,
+            theme: AppTheme.theme,
+            home: userProvider.user == null && !userProvider.isGuest ? const ChooseLoginScreen() : const HomeScreen(),
+            routes: {
+              '/login': (context) => const LoginPage(),
+              '/register': (context) => const RegisterPage(),
+              '/dashboard': (context) => const HomeScreen(),
+            },
+          );
+        }
+      },
+    );
   }
 }
 
@@ -115,8 +53,7 @@ class ChooseLoginScreen extends StatelessWidget {
   const ChooseLoginScreen({super.key});
 
   Future<void> _continueAsGuest(BuildContext context) async {
-    final prefs = await SharedPreferences.getInstance();
-    await prefs.setBool('isGuest', true);
+    Provider.of<UserProvider>(context, listen: false).setGuest(true);
     Navigator.pushReplacement(
       context,
       MaterialPageRoute(builder: (context) => const HomeScreen()),

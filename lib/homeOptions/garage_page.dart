@@ -1,19 +1,17 @@
-// ignore_for_file: avoid_function_literals_in_foreach_calls
 import 'dart:convert';
 import 'package:automate/homeOptions/vehicleOptions/fuel_type.dart';
 import 'package:automate/otherWidgets/create_account_banner.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
-import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 import 'classes/vehicle.dart';
 import 'add_vehicle.dart';
 import 'edit_vehicle.dart';
+import 'package:automate/user_provider.dart';
 
 class GaragePage extends StatefulWidget {
-  final User? user;
-
-  const GaragePage({super.key, this.user});
+  const GaragePage({super.key});
 
   @override
   _GaragePageState createState() => _GaragePageState();
@@ -24,19 +22,44 @@ class _GaragePageState extends State<GaragePage> {
   bool _isLoading = true;
   late bool _isWarningVisible;
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
+  UserProvider? _userProvider;
 
   @override
   void initState() {
     super.initState();
+    _userProvider = Provider.of<UserProvider>(context, listen: false);
     _loadVehicles();
+    _userProvider!.addListener(_onUserChange);
+  }
+
+  @override
+  void dispose() {
+    _userProvider!.removeListener(_onUserChange);
+    super.dispose();
+  }
+
+  void _onUserChange() {
+    if (_userProvider!.user == null) {
+      // User has logged out, clear the vehicles
+      setState(() {
+        _vehicles = [];
+        _isWarningVisible = true;
+      });
+    } else {
+      // User has logged in, load the vehicles
+      _loadVehicles();
+    }
   }
 
   Future<void> _loadVehicles() async {
     setState(() {
       _isLoading = true;
     });
-    if (widget.user != null) {
-      var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
+
+    final user = _userProvider!.user;
+
+    if (user != null) {
+      var collection = _firestore.collection('users').doc(user.uid).collection('vehicles');
       var snapshot = await collection.get();
       var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data() as Map<String, dynamic>..putIfAbsent('uid', () => doc.id))).toList();
       setState(() {
@@ -61,33 +84,15 @@ class _GaragePageState extends State<GaragePage> {
   }
 
   void _addVehicle(String make, String model, FuelType fuelType, String vinNumber, bool isDefault) async {
-  if (widget.user != null) {
-    var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
-    var snapshot = await collection.get();
-    var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data()..putIfAbsent('uid', () => doc.id))).toList();
+    final user = _userProvider!.user;
 
-    if (vehicles.isEmpty) {
-      // If no vehicles, directly add as default
-      var docRef = await collection.add({
-        'make': make,
-        'model': model,
-        'fuelType': fuelType.name,
-        'vinNumber': vinNumber,
-        'isDefault': true
-      });
-      setState(() {
-        _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: true));
-      });
-    } else {
-      if (isDefault) {
-        // Unset all other defaults first
-        List<Future> updates = vehicles.where((v) => v.isDefault).map((vehicle) {
-          return collection.doc(vehicle.uid).update({'isDefault': false});
-        }).toList();
+    if (user != null) {
+      var collection = _firestore.collection('users').doc(user.uid).collection('vehicles');
+      var snapshot = await collection.get();
+      var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data()..putIfAbsent('uid', () => doc.id))).toList();
 
-        await Future.wait(updates); // Ensure all updates complete before proceeding
-
-        // After unsetting defaults, add the new default vehicle
+      if (vehicles.isEmpty) {
+        // If no vehicles, directly add as default
         var docRef = await collection.add({
           'make': make,
           'model': model,
@@ -96,38 +101,60 @@ class _GaragePageState extends State<GaragePage> {
           'isDefault': true
         });
         setState(() {
-          vehicles.forEach((v) {
-            v.isDefault = false; // Update local list state
-          });
-          _vehicles = vehicles;
           _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: true));
         });
       } else {
-        // Add non-default vehicle
-        var docRef = await collection.add({
-          'make': make,
-          'model': model,
-          'fuelType': fuelType.name,
-          'vinNumber': vinNumber,
-          'isDefault': false
-        });
-        setState(() {
-          _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: false));
-        });
+        if (isDefault) {
+          // Unset all other defaults first
+          List<Future> updates = vehicles.where((v) => v.isDefault).map((vehicle) {
+            return collection.doc(vehicle.uid).update({'isDefault': false});
+          }).toList();
+
+          await Future.wait(updates); // Ensure all updates complete before proceeding
+
+          // After unsetting defaults, add the new default vehicle
+          var docRef = await collection.add({
+            'make': make,
+            'model': model,
+            'fuelType': fuelType.name,
+            'vinNumber': vinNumber,
+            'isDefault': true
+          });
+          setState(() {
+            vehicles.forEach((v) {
+              v.isDefault = false; // Update local list state
+            });
+            _vehicles = vehicles;
+            _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: true));
+          });
+        } else {
+          // Add non-default vehicle
+          var docRef = await collection.add({
+            'make': make,
+            'model': model,
+            'fuelType': fuelType.name,
+            'vinNumber': vinNumber,
+            'isDefault': false
+          });
+          setState(() {
+            _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: false));
+          });
+        }
       }
+    } else {
+      // Local storage handling for non-authenticated users
+      setState(() {
+        _vehicles.add(Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: _vehicles.isEmpty));
+        _saveVehicles();
+      });
     }
-  } else {
-    // Local storage handling for non-authenticated users
-    setState(() {
-      _vehicles.add(Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: _vehicles.isEmpty));
-      _saveVehicles();
-    });
   }
-}
 
   void _removeVehicle(int index) {
-    if (widget.user != null) {
-      var docRef = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles').doc(_vehicles[index].uid);
+    final user = _userProvider!.user;
+
+    if (user != null) {
+      var docRef = _firestore.collection('users').doc(user.uid).collection('vehicles').doc(_vehicles[index].uid);
       docRef.delete().then((_) {
         setState(() {
           _vehicles.removeAt(index);
@@ -142,7 +169,9 @@ class _GaragePageState extends State<GaragePage> {
   }
 
   Future<void> _saveVehicles() async {
-    if (widget.user == null) {
+    final user = _userProvider!.user;
+
+    if (user == null) {
       final prefs = await SharedPreferences.getInstance();
       final String vehiclesString = jsonEncode(Vehicle.toMapList(_vehicles));
       await prefs.setString('vehicles', vehiclesString);
@@ -150,62 +179,66 @@ class _GaragePageState extends State<GaragePage> {
   }
 
   void _editVehicle(int index, String make, String model, FuelType fuelType, String vinNumber, bool isDefault) async {
-  if (widget.user != null) {
-    var docRef = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles').doc(_vehicles[index].uid);
+    final user = _userProvider!.user;
 
-    if (isDefault) {
-      // Unset all other defaults first if this vehicle is to be set as default
-      var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
-      var snapshot = await collection.get();
-      var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data()..putIfAbsent('uid', () => doc.id))).toList();
+    if (user != null) {
+      var docRef = _firestore.collection('users').doc(user.uid).collection('vehicles').doc(_vehicles[index].uid);
 
-      List<Future> updates = vehicles.where((v) => v.isDefault).map((vehicle) {
-        return collection.doc(vehicle.uid).update({'isDefault': false});
-      }).toList();
+      if (isDefault) {
+        // Unset all other defaults first if this vehicle is to be set as default
+        var collection = _firestore.collection('users').doc(user.uid).collection('vehicles');
+        var snapshot = await collection.get();
+        var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data()..putIfAbsent('uid', () => doc.id))).toList();
 
-      await Future.wait(updates); // Ensure all updates complete before proceeding
+        List<Future> updates = vehicles.where((v) => v.isDefault).map((vehicle) {
+          return collection.doc(vehicle.uid).update({'isDefault': false});
+        }).toList();
 
-      setState(() {
-          vehicles.forEach((v) {
-            v.isDefault = false; // Update local list state
+        await Future.wait(updates); // Ensure all updates complete before proceeding
+
+        setState(() {
+            vehicles.forEach((v) {
+              v.isDefault = false; // Update local list state
+            });
+            _vehicles = vehicles;
           });
-          _vehicles = vehicles;
+      }
+      await docRef.update({
+          'make': make,
+          'model': model,
+          'fuelType': fuelType.name,
+          'vinNumber': vinNumber,
+          'isDefault': isDefault
         });
-    }
-    await docRef.update({
-        'make': make,
-        'model': model,
-        'fuelType': fuelType.name,
-        'vinNumber': vinNumber,
-        'isDefault': isDefault
+
+      // Update local state
+      setState(() {
+        _vehicles[index] = Vehicle(uid: _vehicles[index].uid, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: isDefault);
       });
 
-    // Update local state
-    setState(() {
-      _vehicles[index] = Vehicle(uid: _vehicles[index].uid, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: isDefault);
-    });
-
-  } else {
-    // Handle local storage for non-authenticated users
-    setState(() {
-      if (isDefault) {
-        // Make sure only one default vehicle exists
-        _vehicles.forEach((v) => v.isDefault = false);
-      }
-      _vehicles[index] = Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: isDefault);
-      _saveVehicles();
-    });
+    } else {
+      // Handle local storage for non-authenticated users
+      setState(() {
+        if (isDefault) {
+          // Make sure only one default vehicle exists
+          _vehicles.forEach((v) => v.isDefault = false);
+        }
+        _vehicles[index] = Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: isDefault);
+        _saveVehicles();
+      });
+    }
   }
-}
 
   @override
   Widget build(BuildContext context) {
+    final user = _userProvider!.user;
+
     return Scaffold(
       body: _isLoading
           ? const Center(child: CircularProgressIndicator())
           : Column(
               children: <Widget>[
-                widget.user == null && _isWarningVisible ? const AccountWarningBanner() : Container(),
+                user == null && _isWarningVisible ? const AccountWarningBanner() : Container(),
                 Expanded(
                   child: _vehicles.isEmpty
                       ? const Center(child: Text('Add your first vehicle'))

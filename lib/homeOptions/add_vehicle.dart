@@ -67,87 +67,89 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
       appBar: AppBar(
         title: const Text('Add Vehicle'),
       ),
-      body: Padding(
-        padding: const EdgeInsets.all(16.0),
-        child: Column(
-          crossAxisAlignment: CrossAxisAlignment.start,
-          children: [
-            TextField(
-              controller: _makeController,
-              decoration: const InputDecoration(labelText: 'Make'),
-            ),
-            TextField(
-              controller: _modelController,
-              decoration: const InputDecoration(labelText: 'Model'),
-            ),
-            TextField(
-              controller: _vinController,
-              decoration: const InputDecoration(labelText: 'VIN Number'),
-            ),
-            const SizedBox(height: 8.0),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.spaceBetween,
-              children: [
-                const Text('Fuel Type', style: TextStyle(fontSize: 16)),
-                DropdownButton<FuelType>(
-                  value: _selectedFuelType,
-                  padding: const EdgeInsets.only(right: 8),
-                  borderRadius: BorderRadius.circular(8),
-                  icon: const Icon(Icons.arrow_downward),
-                  elevation: 16,
-                  onChanged: (FuelType? newValue) {
-                    setState(() {
-                      _selectedFuelType = newValue;
-                    });
-                  },
-                  items: FuelType.values
-                      .map<DropdownMenuItem<FuelType>>((FuelType value) {
-                    return DropdownMenuItem<FuelType>(
-                      value: value,
-                      child: Text(value.name),
-                    );
-                  }).toList(),
-                ),
-              ],
-            ),
-            InkWell(
-              onTap: () {
-                if (!widget.isFirstVehicle) {
-                  // Only allow toggling if it's not the first vehicle
-                  setState(() {
-                    _isDefault =
-                        !_isDefault; // Toggle the default status on tap
-                  });
-                }
-              },
-              child: Row(
-                mainAxisAlignment: MainAxisAlignment.center,
+      body: SingleChildScrollView(
+        child: Padding(
+          padding: const EdgeInsets.all(16.0),
+          child: Column(
+            crossAxisAlignment: CrossAxisAlignment.start,
+            children: [
+              TextField(
+                controller: _makeController,
+                decoration: const InputDecoration(labelText: 'Make'),
+              ),
+              TextField(
+                controller: _modelController,
+                decoration: const InputDecoration(labelText: 'Model'),
+              ),
+              TextField(
+                controller: _vinController,
+                decoration: const InputDecoration(labelText: 'VIN Number'),
+              ),
+              const SizedBox(height: 8.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.spaceBetween,
                 children: [
-                  Checkbox(
-                    value: _isDefault,
-                    onChanged: widget.isFirstVehicle
-                        ? null
-                        : (bool? value) {
-                            setState(() {
-                              _isDefault = value ?? _isDefault;
-                            });
-                          },
+                  const Text('Fuel Type', style: TextStyle(fontSize: 16)),
+                  DropdownButton<FuelType>(
+                    value: _selectedFuelType,
+                    padding: const EdgeInsets.only(right: 8),
+                    borderRadius: BorderRadius.circular(8),
+                    icon: const Icon(Icons.arrow_downward),
+                    elevation: 16,
+                    onChanged: (FuelType? newValue) {
+                      setState(() {
+                        _selectedFuelType = newValue;
+                      });
+                    },
+                    items: FuelType.values
+                        .map<DropdownMenuItem<FuelType>>((FuelType value) {
+                      return DropdownMenuItem<FuelType>(
+                        value: value,
+                        child: Text(value.name),
+                      );
+                    }).toList(),
                   ),
-                  const Text('Make this the default vehicle?'),
                 ],
               ),
-            ),
-            Row(
-              mainAxisAlignment: MainAxisAlignment.center,
-              children: [
-                const SizedBox(height: 16.0),
-                ElevatedButton(
-                  onPressed: _saveVehicle,
-                  child: const Text('Save'),
+              InkWell(
+                onTap: () {
+                  if (!widget.isFirstVehicle) {
+                    // Only allow toggling if it's not the first vehicle
+                    setState(() {
+                      _isDefault =
+                          !_isDefault; // Toggle the default status on tap
+                    });
+                  }
+                },
+                child: Row(
+                  mainAxisAlignment: MainAxisAlignment.center,
+                  children: [
+                    Checkbox(
+                      value: _isDefault,
+                      onChanged: widget.isFirstVehicle
+                          ? null
+                          : (bool? value) {
+                              setState(() {
+                                _isDefault = value ?? _isDefault;
+                              });
+                            },
+                    ),
+                    const Text('Make this the default vehicle?'),
+                  ],
                 ),
-              ],
-            ),
-          ],
+              ),
+              const SizedBox(height: 16.0),
+              Row(
+                mainAxisAlignment: MainAxisAlignment.center,
+                children: [
+                  ElevatedButton(
+                    onPressed: _saveVehicle,
+                    child: const Text('Save'),
+                  ),
+                ],
+              ),
+            ],
+          ),
         ),
       ),
     );

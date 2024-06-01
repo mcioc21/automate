@@ -1,12 +1,13 @@
 import 'package:automate/app_theme.dart';
-import 'package:automate/navigator_manager.dart';
+import 'package:automate/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
+import 'package:provider/provider.dart';
 
 class RegisterPage extends StatefulWidget {
-  final int currentPageIndex;
+  final VoidCallback? onLoginSuccess;
 
-  const RegisterPage({super.key, this.currentPageIndex = 0});
+  const RegisterPage({super.key, this.onLoginSuccess});
 
   @override
   _RegisterPageState createState() => _RegisterPageState();
@@ -37,14 +38,14 @@ class _RegisterPageState extends State<RegisterPage> {
       });
 
       try {
-        final userCredential = await FirebaseAuth.instance.createUserWithEmailAndPassword(
+        final userCredential =
+            await FirebaseAuth.instance.createUserWithEmailAndPassword(
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
-
-        // Registration successful, you can navigate to the home page or show a success message
-        //print('Registration successful: ${userCredential.user?.email}');
-        NavigationManager.goToHomeWithPage(context, currentPageIndex: widget.currentPageIndex);
+        Provider.of<UserProvider>(context, listen: false).setUser(userCredential.user);
+        Navigator.of(context).popUntil((route) => route.isFirst);  // Assuming you want to pop the login screen on successful login
+        widget.onLoginSuccess?.call();
       } on FirebaseAuthException catch (e) {
         setState(() {
           _isLoading = false;
@@ -54,20 +55,21 @@ class _RegisterPageState extends State<RegisterPage> {
     }
   }
 
- @override
+  @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Center(
-          child:  Column(
+          child: Column(
             children: <Widget>[
               SizedBox(height: 10.0),
-              Text('Register',
-              style: TextStyle(color: AppColors.blue),
+              Text(
+                'Register',
+                style: TextStyle(color: AppColors.blue),
               ),
             ],
-           ),
           ),
+        ),
       ),
       body: SingleChildScrollView(
         child: Padding(
@@ -100,7 +102,8 @@ class _RegisterPageState extends State<RegisterPage> {
                   },
                 ),
                 CheckboxListTile(
-                  title: const Text('By pressing the register button I declare to have read terms and conditions'),
+                  title: const Text(
+                      'By pressing the register button I declare to have read terms and conditions'),
                   value: _termsChecked,
                   onChanged: (value) {
                     setState(() {
@@ -129,7 +132,9 @@ class _RegisterPageState extends State<RegisterPage> {
                 const SizedBox(height: 16.0),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _register,
-                  child: _isLoading ? const CircularProgressIndicator() : const Text('Register'),
+                  child: _isLoading
+                      ? const CircularProgressIndicator()
+                      : const Text('Register'),
                 ),
                 if (_error.isNotEmpty)
                   Padding(

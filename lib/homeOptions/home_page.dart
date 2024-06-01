@@ -3,16 +3,15 @@ import 'package:automate/homeOptions/classes/vehicle.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_ad_carousel_slider.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_services_button.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_top_buttons.dart';
+import 'package:automate/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
-import 'package:firebase_auth/firebase_auth.dart';
-import 'package:shared_preferences/shared_preferences.dart';
+import 'package:provider/provider.dart';
 
 class HomePage extends StatefulWidget {
-  final User? user;
-  final void Function(String) onNavigateToServices;
+  final void Function(String)? onNavigateToServices;
 
-  const HomePage({super.key, this.user, required this.onNavigateToServices});
+  const HomePage({super.key, this.onNavigateToServices});
 
   @override
   _HomePageState createState() => _HomePageState();
@@ -21,7 +20,6 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _showWelcomeBanner = false;
-  bool _showGuestBanner = false;
   int _userAppointmentState = 0;
   Vehicle? _vehicle;
   int _userVehicleState = 0;
@@ -29,54 +27,46 @@ class _HomePageState extends State<HomePage> {
   @override
   void initState() {
     super.initState();
-    _checkBannerStatus();
     _determineUserState();
   }
 
   Future<void> _checkBannerStatus() async {
-    final prefs = await SharedPreferences.getInstance();
-    bool hasSeenWelcome = prefs.getBool('hasSeenWelcomeBanner') ?? false;
-    bool hasSeenGuest = prefs.getBool('hasSeenGuestBanner') ?? false;
-
+    UserProvider userProvider = Provider.of<UserProvider>(context, listen: false);
     setState(() {
-      _showWelcomeBanner = widget.user != null && !hasSeenWelcome;
-      _showGuestBanner = widget.user == null && !hasSeenGuest;
+        _showWelcomeBanner = !userProvider.hasSeenWelcomeBanner;
     });
 
-    if (_showWelcomeBanner || _showGuestBanner) {
-      await prefs.setBool('hasSeenWelcomeBanner', true);
-      await prefs.setBool('hasSeenGuestBanner', true);
+    if (_showWelcomeBanner) {
+      await userProvider.setHasSeenWelcomeBanner(true);
+      Provider.of<UserProvider>(context, listen: false).notifyListeners();
     }
   }
 
   void _determineUserState() async {
-    if (widget.user == null) {
+    UserProvider userProvider = Provider.of<UserProvider>(context, listen: false);
+    if (userProvider.user == null) {
       _userAppointmentState = 0;
-      _userVehicleState == 0;  // Guest
+      _userVehicleState = 0; // Guest
     } else {
       // Placeholder for checking if user has appointments
+      bool hasAppointments = false; // TODO: Replace with actual check
+      _userAppointmentState = hasAppointments ? 2 : 1;
 
-      bool hasAppointments = false; // TO DO: Replace with actual check
-      _userAppointmentState = hasAppointments ? 2 : 1; 
-
-      // var collection = _firestore.collection('users').doc(widget.user!.uid).collection('vehicles');
-      // var snapshot = await collection.get();
-      //var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data())).toList();
-      //var vehicle = snapshot.docs.where((element) => false);
-      
-      
-      bool hasVehicle = false; // TO DO: Replace with actual check
+      // Placeholder for checking if user has vehicles
+      bool hasVehicle = false; // TODO: Replace with actual check
       _userVehicleState = hasVehicle ? 2 : 1;
     }
+    _checkBannerStatus();
   }
 
   @override
   Widget build(BuildContext context) {
+    UserProvider userProvider = Provider.of<UserProvider>(context);
     return Scaffold(
       body: SingleChildScrollView(
         child: Column(
           children: [
-            if (_showWelcomeBanner || _showGuestBanner)
+            if (_showWelcomeBanner)
               Padding(
                 padding: const EdgeInsets.only(top: 16, bottom: 8, left: 16, right: 16),
                 child: Container(
@@ -86,13 +76,13 @@ class _HomePageState extends State<HomePage> {
                   ),
                   padding: const EdgeInsets.all(12),
                   child: Text(
-                    _showWelcomeBanner ? 'Welcome to our app!' : 'Welcome! Please log in or create an account.',
+                    !userProvider.isGuest ? 'Welcome to our app!' : 'Welcome! Please log in or create an account.',
                     style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold),
                     textAlign: TextAlign.center,
                   ),
                 ),
               ),
-            if (!_showWelcomeBanner && !_showGuestBanner)
+            if (!_showWelcomeBanner)
               Padding(
                 padding: const EdgeInsets.symmetric(horizontal: 8, vertical: 8),
                 child: SizedBox(
