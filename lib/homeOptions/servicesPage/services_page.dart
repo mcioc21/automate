@@ -1,9 +1,10 @@
-import 'package:automate/homeOptions/choose_discount.dart';
-import 'package:automate/homeOptions/choose_partner.dart';
+import 'package:automate/homeOptions/servicesPage/appointment_options.dart';
+import 'package:automate/homeOptions/servicesPage/choose_discount.dart';
+import 'package:automate/homeOptions/servicesPage/choose_partner.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:automate/app_theme.dart';
-import 'package:automate/homeOptions/choose_workshop.dart';
+import 'package:automate/homeOptions/servicesPage/choose_workshop.dart';
 import 'package:automate/login_or_register.dart';
 import 'package:automate/user_provider.dart';
 
@@ -80,7 +81,9 @@ class _ServicesPageState extends State<ServicesPage> {
               description: 'Manage your appointments',
               icon: Icons.calendar_today,
               onTap: () {
-                // Navigate to Appointments page
+                Navigator.of(context).push(MaterialPageRoute(
+                  builder: (context) => const AppointmentsPage(),
+                ));
               },
             ),
             _buildServiceButton(

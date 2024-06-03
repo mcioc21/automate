@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
-import 'classes/vehicle.dart';
+import '../classes/vehicle.dart';
 import 'add_vehicle.dart';
 import 'edit_vehicle.dart';
 import 'package:automate/user_provider.dart';

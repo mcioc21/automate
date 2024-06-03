@@ -1,4 +1,4 @@
-import 'package:automate/homeOptions/edit_vehicle.dart';
+import 'package:automate/homeOptions/garagePage/edit_vehicle.dart';
 import 'package:automate/homeOptions/classes/vehicle.dart';
 import 'package:automate/homeOptions/vehicleOptions/fuel_type.dart';
 import 'package:flutter/material.dart';

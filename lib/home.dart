@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:automate/app_theme.dart';
-import 'package:automate/homeOptions/home_page.dart';
-import 'package:automate/homeOptions/garage_page.dart';
-import 'package:automate/homeOptions/profile_page.dart';
-import 'package:automate/homeOptions/services_page.dart';
+import 'package:automate/homeOptions/homePage/home_page.dart';
+import 'package:automate/homeOptions/garagePage/garage_page.dart';
+import 'package:automate/homeOptions/profilePage/profile_page.dart';
+import 'package:automate/homeOptions/servicesPage/services_page.dart';
 
 class HomeScreen extends StatefulWidget {
   final int currentPageIndex;

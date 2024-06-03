@@ -1,14 +1,14 @@
 import 'package:automate/app_theme.dart';
-import 'package:automate/homeOptions/map.dart';
+import 'package:automate/homeOptions/servicesPage/map.dart';
 import 'package:flutter/material.dart';
 
-class ChooseWorkshopPage extends StatelessWidget {
-  const ChooseWorkshopPage({super.key});
+class ChooseAppointmentCategory extends StatelessWidget {
+  const ChooseAppointmentCategory({super.key});
 
   @override
   Widget build(BuildContext context) {
 
-    void navigateToMap(String category) {
+    void navigateToServiceList(String category) {
       Navigator.push(
         context,
         MaterialPageRoute(
@@ -49,17 +49,17 @@ class ChooseWorkshopPage extends StatelessWidget {
           WorkshopButton(
             title: "Repair Shop",
             description: "General service shops for all types of repair.",
-            onPressed: () => navigateToMap("repair"),
+            onPressed: () => navigateToServiceList("repair"),
           ),
           WorkshopButton(
             title: "Detailing",
             description: "Specialized in detailing and cosmetic services.",
-            onPressed: () => navigateToMap("detailing"),
+            onPressed: () => navigateToServiceList("detailing"),
           ),
           WorkshopButton(
             title: "Tyre Shop",
             description: "Focused on tyres and wheel services.",
-            onPressed: () => navigateToMap("tyre"),
+            onPressed: () => navigateToServiceList("tyre"),
           ),
         ],
       ),
