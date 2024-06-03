@@ -1,5 +1,5 @@
 import 'package:automate/app_theme.dart';
-import 'package:automate/homeOptions/servicesPage/map.dart';
+import 'package:automate/homeOptions/servicesPage/workshop_list.dart';
 import 'package:flutter/material.dart';
 
 class ChooseAppointmentCategory extends StatelessWidget {
@@ -12,7 +12,7 @@ class ChooseAppointmentCategory extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => MapPage(category: category),
+          builder: (context) => WorkshopListPage(category: category),
         ),
       );
     }
@@ -49,17 +49,17 @@ class ChooseAppointmentCategory extends StatelessWidget {
           WorkshopButton(
             title: "Repair Shop",
             description: "General service shops for all types of repair.",
-            onPressed: () => navigateToServiceList("repair"),
+            onPressed: () => navigateToServiceList("Repair"),
           ),
           WorkshopButton(
             title: "Detailing",
             description: "Specialized in detailing and cosmetic services.",
-            onPressed: () => navigateToServiceList("detailing"),
+            onPressed: () => navigateToServiceList("Detailing"),
           ),
           WorkshopButton(
             title: "Tyre Shop",
             description: "Focused on tyres and wheel services.",
-            onPressed: () => navigateToServiceList("tyre"),
+            onPressed: () => navigateToServiceList("Tyre"),
           ),
         ],
       ),

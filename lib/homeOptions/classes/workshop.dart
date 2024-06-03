@@ -10,6 +10,7 @@ class Workshop {
   final String description;
   final String photo;
   final String category;
+  final String address;
 
   Workshop({
     required this.id,
@@ -19,6 +20,7 @@ class Workshop {
     required this.description,
     required this.photo,
     required this.category,
+    required this.address,
   });
 
   factory Workshop.fromJson(Map<String, dynamic> json) {
@@ -30,6 +32,7 @@ class Workshop {
       description: json['description'],
       photo: json['photo'],
       category: json['category'],
+      address: json['address'],
     );
   }
 
@@ -43,6 +46,7 @@ class Workshop {
       description: map['description'],
       photo: map['photo'],
       category: map['category'],
+      address: map['address'],
     );
   }
 
@@ -56,6 +60,7 @@ class Workshop {
       'description': description,
       'photo': photo,
       'category': category,
+      'address': address,
     };
   }
 }

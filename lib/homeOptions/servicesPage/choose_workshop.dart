@@ -49,17 +49,17 @@ class ChooseWorkshopPage extends StatelessWidget {
           WorkshopButton(
             title: "Repair Shop",
             description: "General service shops for all types of repair.",
-            onPressed: () => navigateToMap("repair"),
+            onPressed: () => navigateToMap("Repair"),
           ),
           WorkshopButton(
             title: "Detailing",
             description: "Specialized in detailing and cosmetic services.",
-            onPressed: () => navigateToMap("detailing"),
+            onPressed: () => navigateToMap("Detailing"),
           ),
           WorkshopButton(
             title: "Tyre Shop",
             description: "Focused on tyres and wheel services.",
-            onPressed: () => navigateToMap("tyre"),
+            onPressed: () => navigateToMap("Tyre"),
           ),
         ],
       ),

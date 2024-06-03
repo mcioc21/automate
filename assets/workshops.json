@@ -6,7 +6,8 @@
     "name": "General Repair Shop",
     "description": "Full service mechanical and bodywork repairs.",
     "photo": "assets/repair_shop.jpg",
-    "category": "repair"
+    "category": "Repair",
+    "address": "Strada Bucuresti 1, Bucuresti"
   },
   {
     "id": 2,
@@ -15,7 +16,8 @@
     "name": "Detailing Magic",
     "description": "High-end detailing and cosmetic care.",
     "photo": "assets/detailing_shop.jpg",
-    "category": "detailing"
+    "category": "Detailing",
+    "address": "Strada Bucuresti 2, Bucuresti"
   },
   {
     "id": 3,
@@ -24,7 +26,8 @@
     "name": "Tyre Specialists",
     "description": "Tyre changes and wheel alignments.",
     "photo": "assets/tyre_shop.jpg",
-    "category": "tyre"
+    "category": "Tyre",
+    "address": "Strada Bucuresti 3, Bucuresti"
   },
   {
     "id": 4,
@@ -32,8 +35,9 @@
     "longitude": 26.04942,
     "name": "AutoFix Center",
     "description": "Comprehensive vehicle repairs and maintenance.",
-    "photo": "assets/repair_shop_2.jpg",
-    "category": "repair"
+    "photo": "assets/repair_shop.jpg",
+    "category": "Repair",
+    "address": "Strada Bucuresti 4, Bucuresti"
   },
   {
     "id": 5,
@@ -41,8 +45,9 @@
     "longitude": 26.08564,
     "name": "Mechanics Hub",
     "description": "Expert mechanical services and diagnostics.",
-    "photo": "assets/repair_shop_3.jpg",
-    "category": "repair"
+    "photo": "assets/repair_shop.jpg",
+    "category": "Repair",
+    "address": "Strada Bucuresti 5, Bucuresti"
   },
   {
     "id": 6,
@@ -50,8 +55,9 @@
     "longitude": 26.14052,
     "name": "Shine Detailers",
     "description": "Specialist in protective coatings and vehicle beautification.",
-    "photo": "assets/detailing_shop_2.jpg",
-    "category": "detailing"
+    "photo": "assets/detailing_shop.jpg",
+    "category": "Detailing",
+    "address": "Strada Bucuresti 6, Bucuresti"
   },
   {
     "id": 7,
@@ -59,8 +65,9 @@
     "longitude": 26.12676,
     "name": "Luxury Detailing Studio",
     "description": "Luxury auto detailing for exclusive clients.",
-    "photo": "assets/detailing_shop_3.jpg",
-    "category": "detailing"
+    "photo": "assets/detailing_shop.jpg",
+    "category": "Detailing",
+    "address": "Strada Bucuresti 7, Bucuresti"
   },
   {
     "id": 8,
@@ -68,8 +75,9 @@
     "longitude": 26.10930,
     "name": "Quick Tyre Fix",
     "description": "Fast and reliable tyre services for all car models.",
-    "photo": "assets/tyre_shop_2.jpg",
-    "category": "tyre"
+    "photo": "assets/tyre_shop.jpg",
+    "category": "Tyre",
+    "address": "Strada Bucuresti 8, Bucuresti"
   },
   {
     "id": 9,
@@ -77,7 +85,8 @@
     "longitude": 26.09876,
     "name": "Wheel Care Specialists",
     "description": "Professional wheel care and tyre installation.",
-    "photo": "assets/tyre_shop_3.jpg",
-    "category": "tyre"
+    "photo": "assets/tyre_shop.jpg",
+    "category": "Tyre",
+    "address": "Strada Bucuresti 9, Bucuresti"
   }
 ]
