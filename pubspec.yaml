@@ -32,7 +32,13 @@ flutter:
     - assets/repair_shop.jpg
     - assets/detailing_shop.jpg
     - assets/tyre_shop.jpg
+    - assets/tyre_shop2.jpg
+    - assets/tyre_shop3.jpg
     - assets/workshops.json
+    - assets/repair_shop2.jpg
+    - assets/repair_shop3.jpg
+    - assets/detailing_shop2.jpg
+    - assets/detailing_shop3.png
   uses-material-design: true
   
   
