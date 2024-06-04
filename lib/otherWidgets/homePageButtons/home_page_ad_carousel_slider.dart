@@ -14,8 +14,8 @@ Widget homePageAdCarouselSlider(BuildContext context) {
       viewportFraction: 1,
     ),
     items: [
-      'assets/placeholder.jpg',
-      'assets/placeholder_1.jpg',
+      'assets/ZUBER.png',
+      'assets/detailing_ad.png',
     ].map((i) {
       return Builder(
         builder: (BuildContext context) {

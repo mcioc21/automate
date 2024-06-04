@@ -39,6 +39,7 @@ flutter:
     - assets/repair_shop3.jpg
     - assets/detailing_shop2.jpg
     - assets/detailing_shop3.png
+    - assets/
   uses-material-design: true
   
   

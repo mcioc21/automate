@@ -1,3 +1,4 @@
+import 'package:automate/homeOptions/servicesPage/book_appointment.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 import 'package:automate/homeOptions/classes/workshop.dart';
@@ -79,12 +80,16 @@ class DetailsWorkshopPage extends StatelessWidget {
             padding: const EdgeInsets.all(16.0),
             child: ElevatedButton(
               onPressed: () {
-                // Navigate to make an appointment page or trigger appointment logic
+                Navigator.of(context).push(
+                  MaterialPageRoute(
+                    builder: (context) => BookAppointmentPage(workshop: workshop),
+                  ),
+                );
               },
               style: ElevatedButton.styleFrom(
                 minimumSize: const Size.fromHeight(50), // Ensures the button is easily tappable
               ),
-              child: const Text("Make an appointment to this workshop"),
+              child: const Text("Book an appointment with this workshop"),
             ),
           ),
         ],
