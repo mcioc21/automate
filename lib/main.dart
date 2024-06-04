@@ -12,7 +12,7 @@ void main() async {
   await Firebase.initializeApp();
 
   runApp(
-    ChangeNotifierProvider(
+    ChangeNotifierProvider<UserProvider>(
       create: (context) => UserProvider(),
       child: const MainApp(),
     ),

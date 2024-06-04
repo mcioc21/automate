@@ -64,9 +64,11 @@ class _GaragePageState extends State<GaragePage> {
       var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data() as Map<String, dynamic>..putIfAbsent('uid', () => doc.id))).toList();
       setState(() {
         _vehicles = vehicles;
+        _userProvider!.updateVehicles(_vehicles); // Notify UserProvider about the updated vehicles
         _isLoading = false;
         _isWarningVisible = false;
       });
+      
     } else {
       final prefs = await SharedPreferences.getInstance();
       final String? vehiclesString = prefs.getString('vehicles');

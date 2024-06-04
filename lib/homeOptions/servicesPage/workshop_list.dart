@@ -2,41 +2,70 @@ import 'package:automate/homeOptions/servicesPage/details_workshop.dart';
 import 'package:flutter/material.dart';
 import 'package:automate/homeOptions/classes/workshop.dart';
 
-class WorkshopListPage extends StatelessWidget {
+class WorkshopListPage extends StatefulWidget {
   final String category;
+  final Future<List<Workshop>> workshopsFuture;
 
-  const WorkshopListPage({super.key, required this.category});
+  const WorkshopListPage({
+    super.key,
+    required this.category,
+    required this.workshopsFuture,
+  });
+
+  @override
+  _WorkshopListPageState createState() => _WorkshopListPageState();
+}
+
+class _WorkshopListPageState extends State<WorkshopListPage> {
+  late Future<List<Workshop>> _workshopsFuture;
+
+  @override
+  void initState() {
+    super.initState();
+    _workshopsFuture = widget.workshopsFuture;
+  }
 
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: Text("$category Workshops"),
+        title: Text("${widget.category} Workshops"),
         leading: IconButton(
           icon: const Icon(Icons.arrow_back),
           onPressed: () => Navigator.of(context).pop(),
         ),
       ),
       body: FutureBuilder<List<Workshop>>(
-        future: loadWorkshops(category),
+        future: _workshopsFuture,
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
-          } else if (snapshot.hasData) {
-            return ListView.builder(
-              itemCount: snapshot.data!.length,
-              itemBuilder: (context, index) {
-                Workshop workshop = snapshot.data![index];
-                return WorkshopTile(workshop: workshop);
-              },
-            );
+          } else if (snapshot.hasData && snapshot.data!.isNotEmpty) {
+            return WorkshopListView(workshops: snapshot.data!);
           } else {
             return const Center(child: Text('No workshops found.'));
           }
         },
       ),
+    );
+  }
+}
+
+class WorkshopListView extends StatelessWidget {
+  final List<Workshop> workshops;
+
+  const WorkshopListView({super.key, required this.workshops});
+
+  @override
+  Widget build(BuildContext context) {
+    return ListView.builder(
+      itemCount: workshops.length,
+      itemBuilder: (context, index) {
+        Workshop workshop = workshops[index];
+        return WorkshopTile(workshop: workshop);
+      },
     );
   }
 }

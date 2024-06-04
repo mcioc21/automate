@@ -1,3 +1,4 @@
+import 'package:automate/homeOptions/classes/vehicle.dart';
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
 import 'package:firebase_auth/firebase_auth.dart';
@@ -9,6 +10,7 @@ class UserProvider with ChangeNotifier {
   bool _hasSeenWelcomeBanner = false;
   bool _initialized = false;  // Add this line to track initialization status
   SharedPreferences? _prefs;
+  List<Vehicle> _vehicles = [];
 
   UserProvider() {
     _initUser();
@@ -18,6 +20,7 @@ class UserProvider with ChangeNotifier {
   bool get isGuest => _isGuest;
   bool get hasSeenWelcomeBanner => _hasSeenWelcomeBanner;
   bool get initialized => _initialized;  // Expose the initialization status
+  List<Vehicle> get vehicles => _vehicles;
 
   Future<void> _initUser() async {
     await Firebase.initializeApp();
@@ -40,6 +43,11 @@ class UserProvider with ChangeNotifier {
       _isGuest = false;
       _hasSeenWelcomeBanner = _prefs!.getBool('hasSeenWelcomeBanner') ?? false;
     }
+  }
+
+  void updateVehicles(List<Vehicle> vehicles) {
+    _vehicles = vehicles;
+    notifyListeners();
   }
 
   Future<void> setGuest(bool value) async {

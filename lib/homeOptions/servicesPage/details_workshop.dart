@@ -38,12 +38,12 @@ class DetailsWorkshopPage extends StatelessWidget {
                   child: Padding(
                     padding: const EdgeInsets.all(8.0),
                     child: Column(
-                      crossAxisAlignment: CrossAxisAlignment.start,
+                      crossAxisAlignment: CrossAxisAlignment.center,
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
-                        Text(workshop.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold)),
-                        const SizedBox(height: 40),
-                        Text(workshop.description),
+                        Text(workshop.name, style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold), textAlign: TextAlign.center,),
+                        const SizedBox(height: 30),
+                        Text(workshop.description, textAlign: TextAlign.center,),
                         const SizedBox(height: 10),
                         Row(
                           children: [
@@ -60,7 +60,8 @@ class DetailsWorkshopPage extends StatelessWidget {
                 ),
                 Expanded(
                   flex: 2, // Give more space to the map
-                  child: GoogleMap(
+                  child: 
+                  GoogleMap(
                     initialCameraPosition: CameraPosition(
                       target: LatLng(workshop.latitude, workshop.longitude),
                       zoom: 12,
@@ -77,7 +78,7 @@ class DetailsWorkshopPage extends StatelessWidget {
             ),
           ),
           Padding(
-            padding: const EdgeInsets.all(16.0),
+            padding: const EdgeInsets.only(top:2.0, bottom: 16.0, left: 16.0, right: 16.0),
             child: ElevatedButton(
               onPressed: () {
                 Navigator.of(context).push(

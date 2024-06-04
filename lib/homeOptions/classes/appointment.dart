@@ -6,6 +6,7 @@ class Appointment {
   String description;
   String userId;
   String workshopId;
+  String? vehicleId;
 
   Appointment({
     required this.uid,
@@ -13,6 +14,7 @@ class Appointment {
     required this.description,
     required this.userId,
     required this.workshopId,
+    this.vehicleId,
   });
 
   factory Appointment.fromSnapshot(DocumentSnapshot snapshot) {
@@ -23,6 +25,7 @@ class Appointment {
       description: data['description'],
       userId: data['userId'],
       workshopId: data['workshopId'],
+      vehicleId: data['vehicleId'],
     );
   }
 
@@ -32,28 +35,35 @@ class Appointment {
       'description': description,
       'userId': userId,
       'workshopId': workshopId,
+      'vehicleId': vehicleId,
     };
   }
 }
 
 Future<List<DateTime>> getAvailableTimeSlots(int workshopId, DateTime date) async {
-  var startOfDay = DateTime(date.year, date.month, date.day);
-  var endOfDay = DateTime(date.year, date.month, date.day, 23, 59, 59);
-  var appointments = await FirebaseFirestore.instance
+  var startOfDay = DateTime(date.year, date.month, date.day, 9);
+  var endOfDay = DateTime(date.year, date.month, date.day, 17);
+
+  // Query Firestore for appointments within the specified date range
+  var querySnapshot = await FirebaseFirestore.instance
     .collection('appointments')
-    .where('workshopId', isEqualTo: workshopId)
+    .where('workshopId', isEqualTo: workshopId.toString()) // Convert workshopId to String for comparison
     .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
     .where('dateTime', isLessThanOrEqualTo: endOfDay)
     .get();
 
-  // Assuming appointments are on hourly slots for simplicity
-  List<DateTime> allPossibleSlots = List.generate(24, (index) => DateTime(date.year, date.month, date.day, index));
-  List<DateTime> takenSlots = appointments.docs
-    .map((doc) => (doc.data()['dateTime'] as Timestamp).toDate())
-    .cast<DateTime>()
-    .toList();
-  
-  return allPossibleSlots.where((slot) => !takenSlots.contains(slot)).toList();
+  // Extract the DateTime objects from the query results
+  List<DateTime> takenSlots = querySnapshot.docs.map((doc) => (doc['dateTime'] as Timestamp).toDate()).toList();
+
+  // Generate all possible slots within the specified time range
+  List<DateTime> allPossibleSlots = List.generate(8, (index) => DateTime(date.year, date.month, date.day, 9 + index));
+
+  // Convert takenSlots to String for comparison
+  List<String> takenSlotsFormatted = takenSlots.map((slot) => slot.toString()).toList();
+
+  // Filter out taken slots
+  return allPossibleSlots.where((slot) => !takenSlotsFormatted.contains(slot.toString())).toList();
 }
+
 
 

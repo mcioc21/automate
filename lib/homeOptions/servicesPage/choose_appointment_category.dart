@@ -1,4 +1,5 @@
 import 'package:automate/app_theme.dart';
+import 'package:automate/homeOptions/classes/workshop.dart';
 import 'package:automate/homeOptions/servicesPage/workshop_list.dart';
 import 'package:flutter/material.dart';
 
@@ -12,7 +13,7 @@ class ChooseAppointmentCategory extends StatelessWidget {
       Navigator.push(
         context,
         MaterialPageRoute(
-          builder: (context) => WorkshopListPage(category: category),
+          builder: (context) => WorkshopListPage(category: category, workshopsFuture: loadWorkshops(category),),
         ),
       );
     }
