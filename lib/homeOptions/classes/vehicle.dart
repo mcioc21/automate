@@ -1,4 +1,8 @@
+// ignore_for_file: avoid_print
+
 import 'package:automate/homeOptions/vehicleOptions/fuel_type.dart';
+import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Vehicle {
   final String? uid;
@@ -49,5 +53,32 @@ class Vehicle {
   // Convert a list of maps to a list of Vehicles
   static List<Vehicle> fromMapList(List<dynamic> maps) {
     return maps.map((map) => Vehicle.fromMap(map as Map<String, dynamic>)).toList();
+  }
+}
+
+Future<String?> getVehicleNameByUid(String vehicleUid) async {
+  try {
+    // Access the Firestore instance
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+    User? user = FirebaseAuth.instance.currentUser;
+
+    // Get the vehicle document by UID
+    DocumentSnapshot doc = await firestore.collection('users').doc(user?.uid).collection('vehicles').doc(vehicleUid).get();
+
+    if (doc.exists) {
+      // Convert the document into a Vehicle object
+      Vehicle vehicle = Vehicle.fromMap(doc.data() as Map<String, dynamic>);
+
+      // Return the full name of the vehicle, which is a combination of make and model
+      return '${vehicle.make} ${vehicle.model}';
+    } else {
+      // Return null if the vehicle does not exist
+      print('No vehicle found with UID: $vehicleUid');
+      return null;
+    }
+  } catch (e) {
+    // Log any errors that occur during the fetch operation
+    print('Error fetching vehicle by UID: $e');
+    return null;
   }
 }

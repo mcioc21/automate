@@ -43,9 +43,6 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
       _vehicles = vehicles;
     });
 
-    // if (_vehicles.isNotEmpty) {
-    //   _selectedVehicle = _vehicles.first; // Set the first vehicle as default
-    // }
   }
 
   @override
@@ -254,7 +251,6 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
       value: _selectedVehicle?.uid,
       onChanged: (value) {
         setState(() {
-          print('Selected Vehicle: $value');
           _selectedVehicle = value != null ? _vehicles.firstWhere((vehicle) => vehicle.uid == value) : null;
         });
       },

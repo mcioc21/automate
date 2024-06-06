@@ -72,3 +72,13 @@ Future<List<Workshop>> loadWorkshops(String category) async {
              .where((workshop) => workshop.category == category)
              .toList();
 }
+
+Future<String> getWorkshopNameById(int workshopId) async {
+  final String response = await rootBundle.loadString('assets/workshops.json');
+  final List<dynamic> data = json.decode(response);
+  final workshop = data.firstWhere(
+    (element) => Workshop.fromJson(element).id == workshopId,
+    orElse: () => null,
+  );
+  return workshop != null ? Workshop.fromJson(workshop).name : 'Unknown Workshop';
+}

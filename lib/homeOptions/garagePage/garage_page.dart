@@ -61,7 +61,7 @@ class _GaragePageState extends State<GaragePage> {
     if (user != null) {
       var collection = _firestore.collection('users').doc(user.uid).collection('vehicles');
       var snapshot = await collection.get();
-      var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data() as Map<String, dynamic>..putIfAbsent('uid', () => doc.id))).toList();
+      var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data()..putIfAbsent('uid', () => doc.id))).toList();
       setState(() {
         _vehicles = vehicles;
         _userProvider!.updateVehicles(_vehicles); // Notify UserProvider about the updated vehicles
@@ -123,9 +123,9 @@ class _GaragePageState extends State<GaragePage> {
             'isDefault': true
           });
           setState(() {
-            vehicles.forEach((v) {
+            for (var v in vehicles) {
               v.isDefault = false; // Update local list state
-            });
+            }
             _vehicles = vehicles;
             _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: true));
           });
@@ -199,9 +199,9 @@ class _GaragePageState extends State<GaragePage> {
         await Future.wait(updates); // Ensure all updates complete before proceeding
 
         setState(() {
-            vehicles.forEach((v) {
+            for (var v in vehicles) {
               v.isDefault = false; // Update local list state
-            });
+            }
             _vehicles = vehicles;
           });
       }
@@ -223,7 +223,9 @@ class _GaragePageState extends State<GaragePage> {
       setState(() {
         if (isDefault) {
           // Make sure only one default vehicle exists
-          _vehicles.forEach((v) => v.isDefault = false);
+          for (var v in _vehicles) {
+            v.isDefault = false;
+          }
         }
         _vehicles[index] = Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: isDefault);
         _saveVehicles();
@@ -241,6 +243,7 @@ class _GaragePageState extends State<GaragePage> {
           : Column(
               children: <Widget>[
                 user == null && _isWarningVisible ? const AccountWarningBanner() : Container(),
+                const SizedBox(height: 10),
                 Expanded(
                   child: _vehicles.isEmpty
                       ? const Center(child: Text('Add your first vehicle'))
@@ -280,7 +283,7 @@ class _GaragePageState extends State<GaragePage> {
                                         children: [
                                           const SizedBox(width: 20),
                                           Text(
-                                            vehicle.make,
+                                            '${vehicle.make} ${vehicle.model}',
                                             style: const TextStyle(fontSize: 18.0),
                                           ),
                                           const Spacer(),

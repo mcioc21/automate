@@ -1,4 +1,5 @@
 import 'package:automate/homeOptions/servicesPage/choose_appointment_category.dart';
+import 'package:automate/homeOptions/servicesPage/view_appointments.dart';
 import 'package:flutter/material.dart';
 import 'package:automate/app_theme.dart'; // Assuming AppColors and app theme configurations are defined here
 
@@ -36,7 +37,12 @@ class AppointmentsPage extends StatelessWidget {
               title: "View Current Appointments",
               description: "Review all your upcoming and past appointments.",
               onPressed: () {
-                // Navigate to view appointments page or function
+                Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => const ViewAppointmentsPage(),
+                  ),
+                );
               },
             ),
           ],
