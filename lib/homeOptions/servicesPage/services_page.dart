@@ -1,6 +1,8 @@
 import 'package:automate/homeOptions/servicesPage/appointment_options.dart';
+import 'package:automate/homeOptions/servicesPage/choose_appointment_category.dart';
 import 'package:automate/homeOptions/servicesPage/choose_discount.dart';
 import 'package:automate/homeOptions/servicesPage/choose_partner.dart';
+import 'package:automate/homeOptions/servicesPage/view_appointments.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:automate/app_theme.dart';
@@ -45,6 +47,12 @@ class _ServicesPageState extends State<ServicesPage> {
                   case 'chooseDiscount':
                     return MaterialPageRoute(
                         builder: (context) => const DiscountsPage());
+                  case 'viewAppointments':
+                    return MaterialPageRoute(
+                        builder: (context) => const ViewAppointmentsPage());
+                  case 'makeAppointment':
+                    return MaterialPageRoute(
+                        builder: (context) => const ChooseAppointmentCategory());
                   default:
                     return MaterialPageRoute(
                         builder: (context) => _buildServiceButtons(context));

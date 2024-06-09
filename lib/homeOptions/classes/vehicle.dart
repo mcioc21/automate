@@ -82,3 +82,57 @@ Future<String?> getVehicleNameByUid(String vehicleUid) async {
     return null;
   }
 }
+
+Future<Vehicle> fetchDefaultVehicle(User? user) async {
+  try {
+    // Access the Firestore instance
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    // Get the default vehicle for the current user
+    QuerySnapshot querySnapshot = await firestore.collection('users').doc(user?.uid).collection('vehicles').where('isDefault', isEqualTo: true).get();
+
+    if (querySnapshot.docs.isNotEmpty) {
+      // Convert the document into a Vehicle object
+      Vehicle vehicle = Vehicle.fromMap(querySnapshot.docs.first.data() as Map<String, dynamic>);
+
+      // Return the default vehicle
+      return vehicle;
+    } else {
+      // Return a default vehicle if no default vehicle is found
+      return Vehicle(
+        make: 'Unknown',
+        model: 'Unknown',
+        vinNumber: 'Unknown',
+        fuelType: FuelType.Petrol,
+        isDefault: true,
+      );
+    }
+  } catch (e) {
+    // Log any errors that occur during the fetch operation
+    print('Error fetching default vehicle: $e');
+    return Vehicle(
+      make: 'Unknown',
+      model: 'Unknown',
+      vinNumber: 'Unknown',
+      fuelType: FuelType.Petrol,
+      isDefault: true,
+    );
+  }
+}
+
+Future<bool> userHasVehicles(User? user) async {
+  try {
+    // Access the Firestore instance
+    FirebaseFirestore firestore = FirebaseFirestore.instance;
+
+    // Get the vehicles for the current user
+    QuerySnapshot querySnapshot = await firestore.collection('users').doc(user?.uid).collection('vehicles').get();
+
+    // Return true if the user has at least one vehicle
+    return querySnapshot.docs.isNotEmpty;
+  } catch (e) {
+    // Log any errors that occur during the fetch operation
+    print('Error fetching user vehicles: $e');
+    return false;
+  }
+}

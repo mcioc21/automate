@@ -1,4 +1,5 @@
 import 'package:cloud_firestore/cloud_firestore.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 
 class Appointment {
   String uid;
@@ -65,5 +66,18 @@ Future<List<DateTime>> getAvailableTimeSlots(int workshopId, DateTime date) asyn
   return allPossibleSlots.where((slot) => !takenSlotsFormatted.contains(slot.toString())).toList();
 }
 
+Future<int> fetchTodayAppointmentsCount(User? user) async {
+  DateTime now = DateTime.now();
+  DateTime startOfDay = DateTime(now.year, now.month, now.day, 8);
 
+  if (user != null) {
+    var querySnapshot = await FirebaseFirestore.instance
+      .collection('appointments')
+      .where('userId', isEqualTo: user.uid)
+      .where('dateTime', isGreaterThanOrEqualTo: startOfDay)
+      .get();
+    return querySnapshot.docs.length;
+  }
+  return 0;
+}
 

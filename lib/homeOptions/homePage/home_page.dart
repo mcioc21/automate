@@ -1,4 +1,5 @@
 import 'package:automate/app_theme.dart';
+import 'package:automate/homeOptions/classes/appointment.dart';
 import 'package:automate/homeOptions/classes/vehicle.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_ad_carousel_slider.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_services_button.dart';
@@ -20,9 +21,10 @@ class HomePage extends StatefulWidget {
 class _HomePageState extends State<HomePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _showWelcomeBanner = false;
-  int _userAppointmentState = 0;
+  int _userState = -1;
+  int _appointmentCount = -1;
   Vehicle? _vehicle;
-  int _userVehicleState = 0;
+  int _vehicleCount = -1;
 
   @override
   void initState() {
@@ -44,17 +46,24 @@ class _HomePageState extends State<HomePage> {
 
   void _determineUserState() async {
     UserProvider userProvider = Provider.of<UserProvider>(context, listen: false);
-    if (userProvider.user == null) {
-      _userAppointmentState = 0;
-      _userVehicleState = 0; // Guest
-    } else {
-      // Placeholder for checking if user has appointments
-      bool hasAppointments = false; // TODO: Replace with actual check
-      _userAppointmentState = hasAppointments ? 2 : 1;
+    if (userProvider.user != null) {
+      // Fetch appointment count
+      int appointmentCount = await fetchTodayAppointmentsCount(userProvider.user);
+      setState(() {
+        _userState =  1;
+        _appointmentCount = appointmentCount;
+      });
 
       // Placeholder for checking if user has vehicles
-      bool hasVehicle = false; // TODO: Replace with actual check
-      _userVehicleState = hasVehicle ? 2 : 1;
+      bool hasVehicle = await userHasVehicles(userProvider.user);
+      _vehicleCount = hasVehicle ? 1 : 0;
+      _vehicle = hasVehicle ? await fetchDefaultVehicle(userProvider.user) : null; // Assume fetching the default vehicle
+    } else {
+      setState(() {
+        _userState = 0;
+        _appointmentCount = 0;
+        _vehicleCount = 0; // Guest
+      });
     }
     _checkBannerStatus();
   }
@@ -95,8 +104,8 @@ class _HomePageState extends State<HomePage> {
                 mainAxisAlignment: MainAxisAlignment.spaceEvenly,
                 children:
                   [
-                    homePageAppointmentButton(context, _userAppointmentState),
-                    homePageVehicleDetailsButton(context, _userVehicleState),
+                    HomePageAppointmentButton(navigateToServices:  widget.onNavigateToServices),
+                    homePageVehicleDetailsButton(context),
                   ]
               ),
             ),

@@ -17,7 +17,8 @@ class ViewAppointmentsPage extends StatelessWidget {
         title: const Text('View Appointments'),
       ),
       body: FutureBuilder<List<Appointment>>(
-        future: fetchAppointments(), // Implement this function to fetch appointments from Firestore
+        future:
+            fetchAppointments(), // Implement this function to fetch appointments from Firestore
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
@@ -27,13 +28,12 @@ class ViewAppointmentsPage extends StatelessWidget {
             List<Appointment> appointments = snapshot.data!;
             return Padding(
               padding: const EdgeInsets.all(8.0),
-             child:
-            ListView.builder(
-              itemCount: appointments.length,
-              itemBuilder: (context, index) {
-                return AppointmentTile(appointment: appointments[index]);
-              },
-            ),
+              child: ListView.builder(
+                itemCount: appointments.length,
+                itemBuilder: (context, index) {
+                  return AppointmentTile(appointment: appointments[index]);
+                },
+              ),
             );
           }
         },
@@ -49,103 +49,136 @@ class AppointmentTile extends StatelessWidget {
 
   @override
   Widget build(BuildContext context) {
-    return ListTile(
-      tileColor: Colors.grey[400],
-      textColor: AppColors.blue,
-      shape: RoundedRectangleBorder(borderRadius: BorderRadius.circular(20), ),
-      title: FutureBuilder<String>(
-        future: getWorkshopNameById(int.parse(appointment.workshopId)),
-        builder: (context, snapshot) {
-          if (snapshot.connectionState == ConnectionState.waiting) {
-            return const Text('Loading Workshop...');
-          } else if (snapshot.hasData) {
-            return Padding(
-              padding: const EdgeInsets.only(top: 8.0),
-               child: RichText(
-                            text: TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: 'Workshop: ',
-                                  style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16, color: AppColors.blue),
-                                ),
-                                TextSpan(
-                                  text: snapshot.data,  // Assuming snapshot.data contains the vehicle name
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.blue),
-                                ),
-                              ],
-                            ),
-                          ),
-                          );
-          } else {
-            return const Text('Workshop: Unknown');
-          }
-        },
-      ),
-      subtitle: Column(
-        crossAxisAlignment: CrossAxisAlignment.start,
-        children: [
-          RichText(
+    return Container(
+      margin: const EdgeInsets.symmetric(vertical: 4),
+      child: ListTile(
+        tileColor: Colors.grey[400],
+        textColor: AppColors.blue,
+        shape: RoundedRectangleBorder(
+          borderRadius: BorderRadius.circular(20),
+        ),
+        title: FutureBuilder<String>(
+          future: getWorkshopNameById(int.parse(appointment.workshopId)),
+          builder: (context, snapshot) {
+            if (snapshot.connectionState == ConnectionState.waiting) {
+              return const Text('Loading Workshop...');
+            } else if (snapshot.hasData) {
+              return Padding(
+                padding: const EdgeInsets.only(top: 8.0),
+                child: RichText(
+                  text: TextSpan(
+                    children: [
+                      const TextSpan(
+                        text: 'Workshop: ',
+                        style: TextStyle(
+                            fontWeight: FontWeight.normal,
+                            fontSize: 16,
+                            color: AppColors.blue),
+                      ),
+                      TextSpan(
+                        text: snapshot
+                            .data, // Assuming snapshot.data contains the vehicle name
+                        style: const TextStyle(
+                            fontWeight: FontWeight.bold,
+                            fontSize: 16,
+                            color: AppColors.blue),
+                      ),
+                    ],
+                  ),
+                ),
+              );
+            } else {
+              return const Text('Workshop: Unknown');
+            }
+          },
+        ),
+        subtitle: Column(
+          crossAxisAlignment: CrossAxisAlignment.start,
+          children: [
+            RichText(
               text: TextSpan(
                 children: [
                   const TextSpan(
                     text: 'Date & Time: ',
-                    style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16, color: AppColors.blue),
+                    style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 16,
+                        color: AppColors.blue),
                   ),
                   TextSpan(
-                    text: DateFormat('dd-MM-yyyy HH:mm').format(appointment.dateTime),
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.blue),
+                    text: DateFormat('dd-MM-yyyy HH:mm')
+                        .format(appointment.dateTime),
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: AppColors.blue),
                   ),
                 ],
               ),
             ),
-          FutureBuilder<String?>(
-            future: getVehicleNameByUid(appointment.vehicleId ?? ''),
-            builder: (context, snapshot) {
-              if (snapshot.connectionState == ConnectionState.waiting) {
-                return const Text('Loading Vehicle...');
-              } else if (snapshot.hasData && snapshot.data != null) {
-                return RichText(
-                            text: TextSpan(
-                              children: [
-                                const TextSpan(
-                                  text: 'Vehicle: ',
-                                  style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16, color: AppColors.blue),
-                                ),
-                                TextSpan(
-                                  text: snapshot.data,  // Assuming snapshot.data contains the vehicle name
-                                  style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.blue),
-                                ),
-                              ],
-                            ),
-                          );
-              } else {
-                return const Text('Vehicle: Not assigned');
-              }
-            },
-          ),
-          RichText(
+            FutureBuilder<String?>(
+              future: getVehicleNameByUid(appointment.vehicleId ?? ''),
+              builder: (context, snapshot) {
+                if (snapshot.connectionState == ConnectionState.waiting) {
+                  return const Text('Loading Vehicle...');
+                } else if (snapshot.hasData && snapshot.data != null) {
+                  return RichText(
+                    text: TextSpan(
+                      children: [
+                        const TextSpan(
+                          text: 'Vehicle: ',
+                          style: TextStyle(
+                              fontWeight: FontWeight.normal,
+                              fontSize: 16,
+                              color: AppColors.blue),
+                        ),
+                        TextSpan(
+                          text: snapshot
+                              .data, // Assuming snapshot.data contains the vehicle name
+                          style: const TextStyle(
+                              fontWeight: FontWeight.bold,
+                              fontSize: 16,
+                              color: AppColors.blue),
+                        ),
+                      ],
+                    ),
+                  );
+                } else {
+                  return const Text('Vehicle: Not assigned');
+                }
+              },
+            ),
+            RichText(
               text: TextSpan(
                 children: [
                   const TextSpan(
                     text: 'Status: ',
-                    style: TextStyle(fontWeight: FontWeight.normal, fontSize: 16, color: AppColors.blue),
+                    style: TextStyle(
+                        fontWeight: FontWeight.normal,
+                        fontSize: 16,
+                        color: AppColors.blue),
                   ),
                   TextSpan(
-                    text: getAppointmentStatus(appointment), // Assuming this function returns the status of the appointment
-                    style: const TextStyle(fontWeight: FontWeight.bold, fontSize: 16, color: AppColors.blue),
+                    text: getAppointmentStatus(
+                        appointment), // Assuming this function returns the status of the appointment
+                    style: const TextStyle(
+                        fontWeight: FontWeight.bold,
+                        fontSize: 16,
+                        color: AppColors.blue),
                   ),
                 ],
               ),
             ),
-          const SizedBox(height: 8),
-        ],
-      ),
-      trailing: ElevatedButton(
-        onPressed: () {
-          // Navigate to view/modify appointment page
-          // You can implement this navigation logic here
-        },
-        child: const Text('Details'),
+            const SizedBox(height: 8),
+          ],
+        ),
+        trailing: ElevatedButton(
+          onPressed: () {
+            // Navigate to view/modify appointment page
+            // You can implement this navigation logic here
+          },
+          child: const Text('Details'),
+        ),
       ),
     );
   }
@@ -171,7 +204,9 @@ Future<List<Appointment>> fetchAppointments() async {
           .where('dateTime', isGreaterThanOrEqualTo: todayAtNine)
           .get();
       // Map each document to an Appointment object
-      List<Appointment> appointments = querySnapshot.docs.map((doc) => Appointment.fromSnapshot(doc)).toList();
+      List<Appointment> appointments = querySnapshot.docs
+          .map((doc) => Appointment.fromSnapshot(doc))
+          .toList();
       return appointments;
     } else {
       // No user signed in

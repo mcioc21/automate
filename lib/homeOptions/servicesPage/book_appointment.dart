@@ -135,14 +135,14 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
   Future<void> _saveAppointment() async {
     if (_selectedDate == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Please select a date and time first."),
+        content: Text("Please select a date and time."),
         backgroundColor: Colors.red,
       ));
       return;
     }
     if (_selectedVehicle == null) {
       ScaffoldMessenger.of(context).showSnackBar(const SnackBar(
-        content: Text("Please select a vehicle first."),
+        content: Text("Please select a vehicle."),
         backgroundColor: Colors.red,
       ));
       return;
@@ -166,9 +166,9 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
         content: Text("Appointment booked successfully!"),
         backgroundColor: Colors.green,
       ));
-      Future.delayed(const Duration(seconds: 2), () {
+        UserProvider userProvider = Provider.of<UserProvider>(context, listen: false);
+        userProvider.fetchTodayAppointmentsCount(); // Update appointment count
         Navigator.of(context).popUntil((route) => route.isFirst); // Pop all routes until the first one
-      });
     })
         .catchError((error) {
       ScaffoldMessenger.of(context).showSnackBar(SnackBar(
