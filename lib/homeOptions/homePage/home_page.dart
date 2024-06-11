@@ -22,7 +22,6 @@ class _HomePageState extends State<HomePage> {
   final FirebaseFirestore _firestore = FirebaseFirestore.instance;
   bool _showWelcomeBanner = false;
   int _userState = -1;
-  int _appointmentCount = -1;
   Vehicle? _vehicle;
   int _vehicleCount = -1;
 
@@ -51,7 +50,6 @@ class _HomePageState extends State<HomePage> {
       int appointmentCount = await fetchTodayAppointmentsCount(userProvider.user);
       setState(() {
         _userState =  1;
-        _appointmentCount = appointmentCount;
       });
 
       // Placeholder for checking if user has vehicles
@@ -61,7 +59,6 @@ class _HomePageState extends State<HomePage> {
     } else {
       setState(() {
         _userState = 0;
-        _appointmentCount = 0;
         _vehicleCount = 0; // Guest
       });
     }

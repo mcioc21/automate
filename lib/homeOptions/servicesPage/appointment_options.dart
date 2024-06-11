@@ -22,7 +22,7 @@ class AppointmentsPage extends StatelessWidget {
           mainAxisAlignment: MainAxisAlignment.center,
           children: [
             AppointmentButton(
-              title: "Make an Appointment",
+              title: "Book an Appointment",
               description: "Schedule a new appointment for service or repair.",
               onPressed: () {
                 Navigator.push(

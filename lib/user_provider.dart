@@ -68,7 +68,7 @@ class UserProvider with ChangeNotifier {
       if(user != null){
       FirebaseFirestore firestore = FirebaseFirestore.instance;
       QuerySnapshot querySnapshot = await firestore
-          .collection('users').doc(user?.uid).collection('vehicles')
+          .collection('users').doc(user.uid).collection('vehicles')
           .where('isDefault', isEqualTo: true).get();
 
       if (querySnapshot.docs.isNotEmpty) {
@@ -80,7 +80,7 @@ class UserProvider with ChangeNotifier {
       }
       notifyListeners();
     } catch (e) {
-      print('Error fetching default vehicle: $e');
+      throw Exception('Error fetching default vehicle: $e');
     }
   }
 

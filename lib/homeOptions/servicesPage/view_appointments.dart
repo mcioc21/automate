@@ -2,28 +2,41 @@ import 'package:automate/app_theme.dart';
 import 'package:automate/homeOptions/classes/appointment.dart';
 import 'package:automate/homeOptions/classes/vehicle.dart';
 import 'package:automate/homeOptions/classes/workshop.dart';
+import 'package:automate/homeOptions/servicesPage/modify_appointment.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 
-class ViewAppointmentsPage extends StatelessWidget {
+class ViewAppointmentsPage extends StatefulWidget {
   const ViewAppointmentsPage({super.key});
 
+  @override
+  _ViewAppointmentsPageState createState() => _ViewAppointmentsPageState();
+}
+
+class _ViewAppointmentsPageState extends State<ViewAppointmentsPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
         title: const Text('View Appointments'),
       ),
-      body: FutureBuilder<List<Appointment>>(
-        future:
-            fetchAppointments(), // Implement this function to fetch appointments from Firestore
+      body: StreamBuilder<List<Appointment>>(
+        stream: fetchAppointmentsStream(),
         builder: (context, snapshot) {
           if (snapshot.connectionState == ConnectionState.waiting) {
             return const Center(child: CircularProgressIndicator());
           } else if (snapshot.hasError) {
             return Center(child: Text('Error: ${snapshot.error}'));
+          } else if (snapshot.data == null || snapshot.data!.isEmpty) {
+            return Center(
+              child: Text(
+                "No appointments yet.\nGo to \"Book an Appointment\" to create one.",
+                textAlign: TextAlign.center,
+                style: TextStyle(fontSize: 18, color: Colors.grey[600]),
+              ),
+            );
           } else {
             List<Appointment> appointments = snapshot.data!;
             return Padding(
@@ -39,6 +52,22 @@ class ViewAppointmentsPage extends StatelessWidget {
         },
       ),
     );
+  }
+
+  Stream<List<Appointment>> fetchAppointmentsStream() {
+    User? user = FirebaseAuth.instance.currentUser;
+    if (user != null) {
+      DateTime today = DateTime.now();
+      DateTime todayAtNine = DateTime(today.year, today.month, today.day, 8);
+      return FirebaseFirestore.instance
+          .collection('appointments')
+          .where('userId', isEqualTo: user.uid)
+          .where('dateTime', isGreaterThanOrEqualTo: todayAtNine)
+          .snapshots()
+          .map((snapshot) => snapshot.docs.map((doc) => Appointment.fromSnapshot(doc)).toList());
+    } else {
+      return const Stream.empty(); // Return an empty stream if user is not logged in
+    }
   }
 }
 
@@ -174,8 +203,12 @@ class AppointmentTile extends StatelessWidget {
         ),
         trailing: ElevatedButton(
           onPressed: () {
-            // Navigate to view/modify appointment page
-            // You can implement this navigation logic here
+              Navigator.push(
+                  context,
+                  MaterialPageRoute(
+                    builder: (context) => ModifyAppointmentPage(appointment: appointment),
+                  ),
+          );
           },
           child: const Text('Details'),
         ),
@@ -190,29 +223,3 @@ class AppointmentTile extends StatelessWidget {
   }
 }
 
-Future<List<Appointment>> fetchAppointments() async {
-  try {
-    // Get the current user
-    User? user = FirebaseAuth.instance.currentUser;
-    if (user != null) {
-      DateTime today = DateTime.now();
-      DateTime todayAtNine = DateTime(today.year, today.month, today.day, 8);
-
-      QuerySnapshot querySnapshot = await FirebaseFirestore.instance
-          .collection('appointments')
-          .where('userId', isEqualTo: user.uid)
-          .where('dateTime', isGreaterThanOrEqualTo: todayAtNine)
-          .get();
-      // Map each document to an Appointment object
-      List<Appointment> appointments = querySnapshot.docs
-          .map((doc) => Appointment.fromSnapshot(doc))
-          .toList();
-      return appointments;
-    } else {
-      // No user signed in
-      return []; // Return an empty list
-    }
-  } catch (e) {
-    return []; // Return an empty list in case of an error
-  }
-}

@@ -7,7 +7,7 @@ import 'package:provider/provider.dart';
 class HomePageAppointmentButton extends StatefulWidget {
   final void Function(String)? navigateToServices;
 
-  HomePageAppointmentButton({Key? key, this.navigateToServices}) : super(key: key);
+  const HomePageAppointmentButton({super.key, this.navigateToServices});
 
   @override
   _HomePageAppointmentButtonState createState() => _HomePageAppointmentButtonState();
@@ -20,7 +20,7 @@ class _HomePageAppointmentButtonState extends State<HomePageAppointmentButton> {
   void initState() {
     super.initState();
     // Delay for 2 seconds before showing the button content
-    Future.delayed(Duration(seconds: 2), () {
+    Future.delayed(const Duration(seconds: 2), () {
       if (mounted) {
         setState(() {
           isLoading = false;
@@ -42,7 +42,10 @@ class _HomePageAppointmentButtonState extends State<HomePageAppointmentButton> {
         width: MediaQuery.of(context).size.width * 0.27,
         child: const Center(child: CircularProgressIndicator()),
       );
-    } else if (appointmentCount > 0) {
+    } else if (appointmentCount == 1) {
+      // Show button with appointment count
+      return _buildAppointmentButton(appointmentCount, 'viewAppointments', 'booking\n planned');
+    } else if (appointmentCount > 1) {
       // Show button with appointment count
       return _buildAppointmentButton(appointmentCount, 'viewAppointments', 'booking(s)\n planned');
     } else if (appointmentCount == 0 && userState == 1) {

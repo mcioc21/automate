@@ -42,7 +42,14 @@ class Appointment {
 }
 
 Future<List<DateTime>> getAvailableTimeSlots(int workshopId, DateTime date) async {
-  var startOfDay = DateTime(date.year, date.month, date.day, 9);
+  var dateNow = DateTime.now();
+  DateTime startOfDay;
+  if(date.month == dateNow.month && date.day == dateNow.day && dateNow.hour < 17){
+    startOfDay = DateTime(date.year, date.month, date.day, dateNow.hour);
+  }
+  else{
+  startOfDay = DateTime(date.year, date.month, date.day, 9);
+  }
   var endOfDay = DateTime(date.year, date.month, date.day, 17);
 
   // Query Firestore for appointments within the specified date range
@@ -57,7 +64,8 @@ Future<List<DateTime>> getAvailableTimeSlots(int workshopId, DateTime date) asyn
   List<DateTime> takenSlots = querySnapshot.docs.map((doc) => (doc['dateTime'] as Timestamp).toDate()).toList();
 
   // Generate all possible slots within the specified time range
-  List<DateTime> allPossibleSlots = List.generate(8, (index) => DateTime(date.year, date.month, date.day, 9 + index));
+  int startHour = (date.month == dateNow.month && date.day == dateNow.day) ? startOfDay.hour : 9;
+  List<DateTime> allPossibleSlots = List.generate(17 - startHour, (index) => DateTime(date.year, date.month, date.day, startHour + index));
 
   // Convert takenSlots to String for comparison
   List<String> takenSlotsFormatted = takenSlots.map((slot) => slot.toString()).toList();
