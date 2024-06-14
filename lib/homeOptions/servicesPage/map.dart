@@ -1,3 +1,4 @@
+import 'package:automate/app_theme.dart';
 import 'package:automate/homeOptions/classes/workshop.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
@@ -17,8 +18,7 @@ class _MapPageState extends State<MapPage> {
   bool _mapLoading = true;
   Workshop? _selectedWorkshop;
 
-  final LatLng _center =
-      const LatLng(44.43111, 26.10083); // Coordinates of Bucharest
+  final LatLng _center = const LatLng(44.43111, 26.10083); // Coordinates of Bucharest
 
   @override
   void initState() {
@@ -27,7 +27,7 @@ class _MapPageState extends State<MapPage> {
   }
 
   void _loadAndSetMarkers() async {
-    final workshops = await loadWorkshops(widget.category);
+    final workshops = await loadWorkshops(widget.category); // Load workshops based on the category
     setState(() {
       _markers.clear(); // Clear existing markers
       for (Workshop workshop in workshops) {
@@ -41,23 +41,13 @@ class _MapPageState extends State<MapPage> {
             ),
             onTap: () {
               setState(() {
-                _selectedWorkshop = workshop;
+                _selectedWorkshop = workshop; // Set selected workshop
               });
             },
-            icon: BitmapDescriptor
-                .defaultMarker, // Customize marker icon if needed
+            icon: BitmapDescriptor.defaultMarker, // Customize marker icon if needed
           ),
         );
       }
-    });
-    setState(() {
-      _mapLoading = false;
-    });
-  }
-
-  void _onMapCreated(GoogleMapController controller) {
-    mapController = controller;
-    setState(() {
       _mapLoading = false;
     });
   }
@@ -66,83 +56,81 @@ class _MapPageState extends State<MapPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Text("Workshops Map",
-            style: TextStyle(fontSize: 15, fontWeight: FontWeight.bold)),
-        leading: Padding(
-          padding: const EdgeInsets.only(left: 25.0),
-          child: IconButton(
-            icon: const Icon(Icons.arrow_back),
-            onPressed: () {
-              Navigator.of(context).pop();
-            },
-          ),
-        ),
+        title: const Text("Workshops Map"),
       ),
-      body: Column(
+      body: Stack(
         children: [
-          Row(
-            mainAxisAlignment: MainAxisAlignment.center,
-            children: [
-              ClipRRect(
-                borderRadius: BorderRadius.circular(20.0), // Rounded corners
-                child: SizedBox(
-                  height: MediaQuery.of(context).size.height *
-                      0.43, // Height of the map
-                  width: MediaQuery.of(context).size.width *
-                      0.95, // Width of the map
-                  child: Stack(
-                    children: [
-                      GoogleMap(
-                        markers: _markers,
-                        zoomControlsEnabled: true,
-                        onMapCreated: _onMapCreated,
-                        initialCameraPosition: CameraPosition(
-                          target: _center,
-                          zoom: 12.0,
-                        ),
-                      ),
-                      (_mapLoading)
-                          ? const Center(child: CircularProgressIndicator())
-                          : Container(),
-                    ],
-                  ),
-                ),
-              ),
-            ],
+          GoogleMap(
+            markers: _markers,
+            onMapCreated: _onMapCreated,
+            zoomControlsEnabled: true,
+            initialCameraPosition: CameraPosition(
+              target: _center,
+              zoom: 12.0,
+            ),
           ),
-          Row(
-            mainAxisAlignment: MainAxisAlignment.start,
-            children: [
-              Padding(
-                  padding: const EdgeInsets.all(10.0),
-                  child: _selectedWorkshop != null
-                      ? Row(
-                        mainAxisAlignment: MainAxisAlignment.start,
-                        children: [
-                          Column(
-                            children: [
-                              Text("Name: ${_selectedWorkshop!.name}",
-                                  style: const TextStyle(
-                                      fontSize: 15.0,
-                                      fontWeight: FontWeight.bold)),
-                              // Text("Description: ${_selectedWorkshop!.description}",
-                              //     style: const TextStyle(
-                              //         fontSize: 15.0,
-                              //         fontWeight: FontWeight.bold,
-                              //         overflow: TextOverflow.ellipsis,
-                              //         )
-                              //         ),
-                            ],
-                          ),
-                        ])
-                      : const Padding(
-                          padding: EdgeInsets.only(top: 20.0),
-                          child:
-                              Text("Click on a marker to see more details!"))),
-            ],
-          )
+          Positioned(
+            bottom: 30,
+            left: 20,
+            right: 20,
+            child: Container(
+              decoration: BoxDecoration(
+                color: AppColors.snow,
+                borderRadius: BorderRadius.circular(15),
+                boxShadow: [
+                  BoxShadow(
+                    color: Colors.black.withOpacity(0.2),
+                    blurRadius: 10,
+                    offset: const Offset(0, 5),
+                  ),
+                ],
+              ),
+              child: Padding(
+                padding: const EdgeInsets.all(16),
+                child: _selectedWorkshop != null ? workshopDetails() : promptToSelect(),
+              ),
+            ),
+          ),
+          if (_mapLoading)
+            const Center(child: CircularProgressIndicator()),
         ],
       ),
     );
+  }
+
+  Widget workshopDetails() {
+    return Column(
+      mainAxisSize: MainAxisSize.min,
+      crossAxisAlignment: CrossAxisAlignment.start,
+      children: [
+        Text(_selectedWorkshop!.name, style: const TextStyle(fontSize: 18, fontWeight: FontWeight.bold)),
+        const SizedBox(height: 8),
+        Text(_selectedWorkshop!.address),
+        const SizedBox(height: 16),
+        ElevatedButton(
+          onPressed: () {
+            // Implement navigation to see more details or booking
+          },
+          style: ElevatedButton.styleFrom(
+            minimumSize: const Size.fromHeight(36),
+          ),
+          child: const Text("See more"),
+        ),
+      ],
+    );
+  }
+
+  Widget promptToSelect() {
+    return const Center(
+      child: Text(
+        "Tap any marker to see more",
+        textAlign: TextAlign.center,
+        style: TextStyle(fontSize: 18),
+      ),
+    );
+  }
+
+  void _onMapCreated(GoogleMapController controller) {
+    mapController = controller;
   }
 }

@@ -87,7 +87,7 @@ class AppointmentButton extends StatelessWidget {
             const SizedBox(height: 4),
             Padding(
               padding: const EdgeInsets.symmetric(horizontal: 16.0),
-              child: Text(description, style: const TextStyle(fontSize: 12)),
+              child: Text(description, style: const TextStyle(fontSize: 12, color: Colors.amber)),
             )
           ],
         ),
