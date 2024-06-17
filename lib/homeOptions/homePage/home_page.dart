@@ -1,10 +1,10 @@
-import 'package:automate/app_theme.dart';
+import 'package:automate/baseFiles/app_theme.dart';
 import 'package:automate/homeOptions/classes/appointment.dart';
 import 'package:automate/homeOptions/classes/vehicle.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_ad_carousel_slider.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_services_button.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_top_buttons.dart';
-import 'package:automate/user_provider.dart';
+import 'package:automate/baseFiles/user_provider.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
@@ -47,7 +47,6 @@ class _HomePageState extends State<HomePage> {
     UserProvider userProvider = Provider.of<UserProvider>(context, listen: false);
     if (userProvider.user != null) {
       // Fetch appointment count
-      int appointmentCount = await fetchTodayAppointmentsCount(userProvider.user);
       setState(() {
         _userState =  1;
       });

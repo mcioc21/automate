@@ -1,4 +1,4 @@
-import 'package:automate/app_theme.dart';
+import 'package:automate/baseFiles/app_theme.dart';
 import 'package:automate/homeOptions/classes/workshop.dart';
 import 'package:automate/homeOptions/servicesPage/workshop_list.dart';
 import 'package:flutter/material.dart';

@@ -1,4 +1,4 @@
-import 'package:automate/app_theme.dart';
+import 'package:automate/baseFiles/app_theme.dart';
 import 'package:automate/homeOptions/classes/workshop.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';

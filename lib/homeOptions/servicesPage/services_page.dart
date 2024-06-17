@@ -5,10 +5,10 @@ import 'package:automate/homeOptions/servicesPage/choose_partner.dart';
 import 'package:automate/homeOptions/servicesPage/view_appointments.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
-import 'package:automate/app_theme.dart';
+import 'package:automate/baseFiles/app_theme.dart';
 import 'package:automate/homeOptions/servicesPage/choose_workshop.dart';
-import 'package:automate/login_or_register.dart';
-import 'package:automate/user_provider.dart';
+import 'package:automate/baseFiles/login_or_register.dart';
+import 'package:automate/baseFiles/user_provider.dart';
 
 class ServicesPage extends StatefulWidget {
   final GlobalKey<NavigatorState>? navigatorKey;

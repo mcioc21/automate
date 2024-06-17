@@ -1,9 +1,9 @@
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
-import 'package:automate/app_theme.dart';
-import 'package:automate/user_provider.dart';
-import 'package:automate/register.dart';
+import 'package:automate/baseFiles/app_theme.dart';
+import 'package:automate/baseFiles/user_provider.dart';
+import 'package:automate/baseFiles/register.dart';
 
 class LoginPage extends StatefulWidget {
   final VoidCallback? onLoginSuccess;

@@ -1,6 +1,5 @@
-import 'package:automate/app_theme.dart';
 import 'package:automate/homeOptions/classes/vehicle.dart';
-import 'package:automate/user_provider.dart';
+import 'package:automate/baseFiles/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';
 
@@ -126,57 +125,54 @@ class _HomePageAppointmentButtonState extends State<HomePageAppointmentButton> {
   }
 }
 
-
+// Widget that uses defaultVehicle
 
 Widget homePageVehicleDetailsButton(BuildContext context) {
-  UserProvider userProvider = Provider.of<UserProvider>(context, listen: false);
-  int vehicleCount = 0;
-  //Vehicle? vehicle = userProvider.vehicles.isNotEmpty ? userProvider.defaultVehicle : null;
-  //print(userProvider.vehicles.first.make);
-  //print(vehicle);
-  if(vehicleCount == 0){
-  return ElevatedButton(
-    onPressed: () {
-      // Action for button press
-    },
-    style: ButtonStyle(
-        shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-      RoundedRectangleBorder(
-        borderRadius: BorderRadius.circular(18.0),
-      ),
-    )),
-    child: SizedBox(
-      height: MediaQuery.of(context).size.height * 0.15,
-      width: MediaQuery.of(context).size.width * 0.27,
-      child: const Center(
-        child:
-      Text('Add a vehicle first', textAlign: TextAlign.center),
-      ),
-    ),
-  );
-  }
-  else{
-      return ElevatedButton(
-        onPressed: () {
-          // Action for button press
-        },
-        style: ButtonStyle(
+  return Consumer<UserProvider>(
+    builder: (context, userProvider, child) {
+      Vehicle? defaultVehicle = userProvider.defaultVehicle;
+      if (defaultVehicle == null) {
+        return ElevatedButton(
+          onPressed: () {
+            Navigator.pushNamed(context, '/addVehiclePage'); // Assuming '/addVehiclePage' is the route to add a new vehicle
+          },
+          style: ButtonStyle(
             shape: MaterialStateProperty.all<RoundedRectangleBorder>(
-          RoundedRectangleBorder(
-            borderRadius: BorderRadius.circular(18.0),
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
+            )),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.15,
+            width: MediaQuery.of(context).size.width * 0.27,
+            child: const Center(child: Text('Add a vehicle first', textAlign: TextAlign.center)),
           ),
-        )),
-        child: SizedBox(
-          height: MediaQuery.of(context).size.height * 0.15,
-          width: MediaQuery.of(context).size.width * 0.27,
-          child: const Column(
-            mainAxisAlignment: MainAxisAlignment.center,
-            crossAxisAlignment: CrossAxisAlignment.start,
-            children: [
-              
-            ],
+        );
+      } else {
+        return ElevatedButton(
+          onPressed: () {
+            // Actions to see more details or manage the vehicle
+          },
+          style: ButtonStyle(
+            shape: MaterialStateProperty.all<RoundedRectangleBorder>(
+              RoundedRectangleBorder(borderRadius: BorderRadius.circular(18.0)),
+            )),
+          child: SizedBox(
+            height: MediaQuery.of(context).size.height * 0.15,
+            width: MediaQuery.of(context).size.width * 0.27,
+            child: Column(
+              mainAxisAlignment: MainAxisAlignment.center,
+              crossAxisAlignment: CrossAxisAlignment.start,
+              children: [
+                Text(
+                  defaultVehicle.make,
+                  style: const TextStyle(fontSize: 22, fontWeight: FontWeight.bold),
+                  textAlign: TextAlign.start,
+                ),
+                Expanded(child: Text(defaultVehicle.model, style: const TextStyle(fontSize: 16, fontWeight: FontWeight.bold), textAlign: TextAlign.end)),
+              ],
+            ),
           ),
-        ),
-      );
-  }
+        );
+      }
+    },
+  );
 }

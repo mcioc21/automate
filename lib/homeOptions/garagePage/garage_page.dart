@@ -8,7 +8,7 @@ import 'package:provider/provider.dart';
 import '../classes/vehicle.dart';
 import 'add_vehicle.dart';
 import 'edit_vehicle.dart';
-import 'package:automate/user_provider.dart';
+import 'package:automate/baseFiles/user_provider.dart';
 
 class GaragePage extends StatefulWidget {
   const GaragePage({super.key});

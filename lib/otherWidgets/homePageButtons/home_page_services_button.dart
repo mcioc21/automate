@@ -1,4 +1,4 @@
-import 'package:automate/app_theme.dart';
+import 'package:automate/baseFiles/app_theme.dart';
 import 'package:flutter/material.dart';
 
 // Adding a navigation function parameter

@@ -1,11 +1,11 @@
 import 'package:firebase_core/firebase_core.dart';
 import 'package:flutter/material.dart';
-import 'package:automate/app_theme.dart';
-import 'package:automate/home.dart';
-import 'package:automate/login.dart';
-import 'package:automate/register.dart';
+import 'package:automate/baseFiles/app_theme.dart';
+import 'package:automate/baseFiles/home.dart';
+import 'package:automate/baseFiles/login.dart';
+import 'package:automate/baseFiles/register.dart';
 import 'package:provider/provider.dart';
-import 'package:automate/user_provider.dart';
+import 'package:automate/baseFiles/user_provider.dart';
 
 void main() async {
   WidgetsFlutterBinding.ensureInitialized();

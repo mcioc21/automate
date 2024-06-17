@@ -1,7 +1,7 @@
 import 'package:automate/homeOptions/servicesPage/choose_appointment_category.dart';
 import 'package:automate/homeOptions/servicesPage/view_appointments.dart';
 import 'package:flutter/material.dart';
-import 'package:automate/app_theme.dart'; // Assuming AppColors and app theme configurations are defined here
+import 'package:automate/baseFiles/app_theme.dart'; // Assuming AppColors and app theme configurations are defined here
 
 class AppointmentsPage extends StatelessWidget {
   const AppointmentsPage({super.key});

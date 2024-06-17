@@ -1,6 +1,6 @@
-import 'package:automate/app_theme.dart';
+import 'package:automate/baseFiles/app_theme.dart';
 import 'package:flutter/material.dart';
-import 'package:automate/register.dart';
+import 'package:automate/baseFiles/register.dart';
 
 class AccountWarningBanner extends StatefulWidget {
   final Function(bool)? onDismiss; // Callback for handling visibility state externally if needed

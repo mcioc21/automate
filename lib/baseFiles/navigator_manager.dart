@@ -1,6 +1,6 @@
-import 'package:automate/home.dart';
-import 'package:automate/login.dart';
-import 'package:automate/register.dart';
+import 'package:automate/baseFiles/home.dart';
+import 'package:automate/baseFiles/login.dart';
+import 'package:automate/baseFiles/register.dart';
 import 'package:flutter/material.dart';
 
 class NavigationManager {

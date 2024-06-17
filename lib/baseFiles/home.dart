@@ -1,5 +1,5 @@
 import 'package:flutter/material.dart';
-import 'package:automate/app_theme.dart';
+import 'package:automate/baseFiles/app_theme.dart';
 import 'package:automate/homeOptions/homePage/home_page.dart';
 import 'package:automate/homeOptions/garagePage/garage_page.dart';
 import 'package:automate/homeOptions/profilePage/profile_page.dart';

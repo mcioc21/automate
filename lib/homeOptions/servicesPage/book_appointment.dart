@@ -1,7 +1,7 @@
-import 'package:automate/app_theme.dart';
+import 'package:automate/baseFiles/app_theme.dart';
 import 'package:flutter/material.dart';
 import 'package:automate/homeOptions/classes/vehicle.dart';
-import 'package:automate/user_provider.dart';
+import 'package:automate/baseFiles/user_provider.dart';
 import 'package:firebase_auth/firebase_auth.dart';
 import 'package:automate/homeOptions/classes/workshop.dart';
 import 'package:automate/homeOptions/classes/appointment.dart';

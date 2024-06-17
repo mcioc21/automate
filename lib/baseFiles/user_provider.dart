@@ -9,7 +9,7 @@ class UserProvider with ChangeNotifier {
   User? _user;
   bool _isGuest = false;
   bool _hasSeenWelcomeBanner = false;
-  bool _initialized = false;  // Add this line to track initialization status
+  bool _initialized = false;
   SharedPreferences? _prefs;
   List<Vehicle> _vehicles = [];
   Vehicle? _defaultVehicle;
@@ -22,7 +22,7 @@ class UserProvider with ChangeNotifier {
   User? get user => _user;
   bool get isGuest => _isGuest;
   bool get hasSeenWelcomeBanner => _hasSeenWelcomeBanner;
-  bool get initialized => _initialized;  // Expose the initialization status
+  bool get initialized => _initialized;
   List<Vehicle> get vehicles => _vehicles;
   Vehicle? get defaultVehicle => _defaultVehicle;
   int get appointmentCount => _todayAppointmentCount;
@@ -63,7 +63,7 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
-  Future<void> fetchDefaultVehicle(User? user) async {
+  void fetchDefaultVehicle(User? user) async {
     try {
       if(user != null){
       FirebaseFirestore firestore = FirebaseFirestore.instance;
@@ -76,7 +76,12 @@ class UserProvider with ChangeNotifier {
       } 
       }
       else {
-        _defaultVehicle = null;  // No default vehicle found
+        if(_vehicles.isEmpty) {
+          _defaultVehicle = null;
+        }
+        else {
+          _defaultVehicle = _vehicles.first;
+        }
       }
       notifyListeners();
     } catch (e) {
