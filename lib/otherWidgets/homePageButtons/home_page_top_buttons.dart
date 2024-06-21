@@ -1,4 +1,4 @@
-import 'package:automate/homeOptions/classes/vehicle.dart';
+import 'package:automate/baseFiles/classes/vehicle.dart';
 import 'package:automate/baseFiles/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:provider/provider.dart';

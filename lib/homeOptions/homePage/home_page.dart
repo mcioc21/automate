@@ -1,6 +1,6 @@
 import 'package:automate/baseFiles/app_theme.dart';
-import 'package:automate/homeOptions/classes/appointment.dart';
-import 'package:automate/homeOptions/classes/vehicle.dart';
+import 'package:automate/baseFiles/classes/appointment.dart';
+import 'package:automate/baseFiles/classes/vehicle.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_ad_carousel_slider.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_services_button.dart';
 import 'package:automate/otherWidgets/homePageButtons/home_page_top_buttons.dart';

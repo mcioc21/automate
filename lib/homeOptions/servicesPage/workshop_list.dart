@@ -1,6 +1,6 @@
 import 'package:automate/homeOptions/servicesPage/details_workshop.dart';
 import 'package:flutter/material.dart';
-import 'package:automate/homeOptions/classes/workshop.dart';
+import 'package:automate/baseFiles/classes/workshop.dart';
 
 class WorkshopListPage extends StatefulWidget {
   final String category;

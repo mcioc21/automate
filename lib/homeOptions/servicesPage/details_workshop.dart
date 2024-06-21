@@ -1,7 +1,7 @@
 import 'package:automate/homeOptions/servicesPage/book_appointment.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
-import 'package:automate/homeOptions/classes/workshop.dart';
+import 'package:automate/baseFiles/classes/workshop.dart';
 
 class DetailsWorkshopPage extends StatelessWidget {
   final Workshop workshop;

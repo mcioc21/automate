@@ -5,7 +5,7 @@ import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:provider/provider.dart';
-import '../classes/vehicle.dart';
+import '../../baseFiles/classes/vehicle.dart';
 import 'add_vehicle.dart';
 import 'edit_vehicle.dart';
 import 'package:automate/baseFiles/user_provider.dart';
@@ -246,7 +246,7 @@ class _GaragePageState extends State<GaragePage> {
                 const SizedBox(height: 10),
                 Expanded(
                   child: _vehicles.isEmpty
-                      ? const Center(child: Text('Add your first vehicle'))
+                      ? const Center(child: Text('Press the blue button to add your first vehicle'))
                       : ListView.builder(
                           itemCount: _vehicles.length,
                           itemBuilder: (context, index) {

@@ -1,8 +1,8 @@
 import 'package:automate/baseFiles/app_theme.dart';
-import 'package:automate/homeOptions/classes/vehicle.dart';
-import 'package:automate/homeOptions/classes/workshop.dart';
+import 'package:automate/baseFiles/classes/vehicle.dart';
+import 'package:automate/baseFiles/classes/workshop.dart';
 import 'package:flutter/material.dart';
-import 'package:automate/homeOptions/classes/appointment.dart';
+import 'package:automate/baseFiles/classes/appointment.dart';
 import 'package:cloud_firestore/cloud_firestore.dart';
 import 'package:intl/intl.dart';
 import 'package:provider/provider.dart';

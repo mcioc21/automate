@@ -27,12 +27,12 @@ Widget homePageAdCarouselSlider(BuildContext context) {
                 color: Colors.transparent, // Use transparent to keep the image visible
                 child: InkWell(
                   onTap: () {
-                    if(i == 'assets/placeholder.jpg') {
+                    if(i == 'assets/ZUBER.png') {
                       // Navigator.push(
                       //             context,
                       //             MaterialPageRoute(builder: (context) => const WorkshopsPage()),
                       //           );
-                    } else if(i == 'assets/placeholder_1.jpg') {
+                    } else if(i == 'assets/detailing_ad.png') {
                       // Navigator.push(
                       //             context,
                       //             MaterialPageRoute(builder: (context) => const DiscountsPage()),

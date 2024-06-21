@@ -15,6 +15,7 @@ class RegisterPage extends StatefulWidget {
 
 class _RegisterPageState extends State<RegisterPage> {
   final _formKey = GlobalKey<FormState>();
+  final _nameController = TextEditingController();
   final _emailController = TextEditingController();
   final _passwordController = TextEditingController();
   bool _termsChecked = false;
@@ -43,8 +44,14 @@ class _RegisterPageState extends State<RegisterPage> {
           email: _emailController.text.trim(),
           password: _passwordController.text,
         );
-        Provider.of<UserProvider>(context, listen: false).setUser(userCredential.user);
-        Navigator.of(context).popUntil((route) => route.isFirst);  // Assuming you want to pop the login screen on successful login
+        User? user = userCredential.user;
+        if (user != null) {
+          await user.updateDisplayName(_nameController.text);
+          await user.reload();
+          user = FirebaseAuth.instance.currentUser;
+          Provider.of<UserProvider>(context, listen: false).setUser(user);
+        }
+        Navigator.of(context).popUntil((route) => route.isFirst);
         widget.onLoginSuccess?.call();
       } on FirebaseAuthException catch (e) {
         setState(() {
@@ -59,19 +66,21 @@ class _RegisterPageState extends State<RegisterPage> {
   Widget build(BuildContext context) {
     return Scaffold(
       appBar: AppBar(
-        title: const Center(
-          child: Column(
+        title: const Row(
+          children: [Column(
             children: <Widget>[
-              SizedBox(height: 10.0),
               Text(
                 'Register',
                 style: TextStyle(color: AppColors.blue),
               ),
             ],
           ),
+          ],
         ),
       ),
-      body: SingleChildScrollView(
+      body: Center( 
+        child:
+        SingleChildScrollView(
         child: Padding(
           padding: const EdgeInsets.all(16.0),
           child: Form(
@@ -79,7 +88,16 @@ class _RegisterPageState extends State<RegisterPage> {
             child: Column(
               crossAxisAlignment: CrossAxisAlignment.stretch,
               children: <Widget>[
-                const SizedBox(height: 80.0), // Works only for this screen size
+                TextFormField(
+                  controller: _nameController,
+                  decoration: const InputDecoration(labelText: 'Name'),
+                  validator: (value) {
+                    if (value == null || value.isEmpty) {
+                      return 'Please enter your name';
+                    }
+                    return null;
+                  },
+                ),
                 TextFormField(
                   controller: _emailController,
                   decoration: const InputDecoration(labelText: 'Email'),
@@ -101,9 +119,9 @@ class _RegisterPageState extends State<RegisterPage> {
                     return null;
                   },
                 ),
+                const SizedBox(height: 16),
                 CheckboxListTile(
-                  title: const Text(
-                      'By pressing the register button I declare to have read terms and conditions'),
+                  title: const Text('I agree to the terms and conditions'),
                   value: _termsChecked,
                   onChanged: (value) {
                     setState(() {
@@ -129,7 +147,7 @@ class _RegisterPageState extends State<RegisterPage> {
                     });
                   },
                 ),
-                const SizedBox(height: 16.0),
+                const SizedBox(height: 8),
                 ElevatedButton(
                   onPressed: _isLoading ? null : _register,
                   child: _isLoading
@@ -148,6 +166,7 @@ class _RegisterPageState extends State<RegisterPage> {
             ),
           ),
         ),
+      ),
       ),
     );
   }

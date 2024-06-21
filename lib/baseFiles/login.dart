@@ -43,6 +43,19 @@ class _LoginPageState extends State<LoginPage> {
   @override
   Widget build(BuildContext context) {
     return Scaffold(
+      appBar: AppBar(
+        title: const Row(
+          children: [Column(
+            children: <Widget>[
+              Text(
+                'Login',
+                style: TextStyle(color: AppColors.blue),
+              ),
+            ],
+          ),
+          ],
+        ),
+      ),
       body: Center(
         child: Padding(
           padding: const EdgeInsets.all(16.0),

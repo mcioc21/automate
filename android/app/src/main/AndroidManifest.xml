@@ -1,6 +1,8 @@
 <manifest xmlns:android="http://schemas.android.com/apk/res/android">
     <uses-sdk android:minSdkVersion="19" />
 
+    <uses-permission android:name="android.permission.INTERNET" />
+
     <application
         android:label="auto_mate"
         android:name="${applicationName}"
@@ -21,6 +23,15 @@
                 <action android:name="android.intent.action.MAIN"/>
                 <category android:name="android.intent.category.LAUNCHER"/>
             </intent-filter>
+            <intent-filter>
+        <action android:name="android.intent.action.VIEW" />
+        <!-- Include the host attribute if you want your app to respond
+             only to URLs with your app's domain. -->
+        <data android:scheme="http" android:host="www.google.com" />
+        <category android:name="android.intent.category.DEFAULT" />
+        <!-- The BROWSABLE category is required to get links from web pages. -->
+        <category android:name="android.intent.category.BROWSABLE" />
+    </intent-filter>
         </activity>
         <!-- Insert your Google Maps API Key below -->
         <meta-data
