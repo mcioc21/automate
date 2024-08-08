@@ -1,5 +1,8 @@
+import 'package:automate/baseFiles/classes/vehicle.dart';
+import 'package:automate/baseFiles/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:automate/homeOptions/vehicleOptions/fuel_type.dart';
+import 'package:provider/provider.dart';
 
 class EditVehiclePage extends StatefulWidget {
   final String make;
@@ -51,17 +54,21 @@ class _EditVehiclePageState extends State<EditVehiclePage> {
   }
 
   void _saveVehicle() {
-    if (_makeController.text.isNotEmpty &&
-        _modelController.text.isNotEmpty &&
-        _vinController.text.isNotEmpty &&
+    final make = _makeController.text.trim();
+    final model = _modelController.text.trim();
+    final vinNumber = _vinController.text.trim();
+    if (make.isNotEmpty &&
+        model.isNotEmpty &&
+        vinNumber.isNotEmpty &&
         _selectedFuelType != null) {
       widget.editVehicleCallback(
-        _makeController.text.trim(),
-        _modelController.text.trim(),
-        _selectedFuelType!,
-        _vinController.text.trim(),
-        _isDefault,
+          make, model, _selectedFuelType!, vinNumber, _isDefault);
+      if (_isDefault) {
+      Provider.of<UserProvider>(context, listen: false).updateAfterVehicleChange(
+        Vehicle(make: make, model: model, fuelType: _selectedFuelType!, vinNumber: vinNumber),
+        true
       );
+      }
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

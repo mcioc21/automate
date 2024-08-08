@@ -56,11 +56,20 @@ class _BookAppointmentPageState extends State<BookAppointmentPage> {
   }
 
   void _selectDate(BuildContext context) async {
+    DateTime initialDate = DateTime.now();
+    if (initialDate.weekday == 6) { // If it's Saturday, skip to Monday
+      initialDate = initialDate.add(const Duration(days: 2));
+    } else if (initialDate.weekday == 7) { // If it's Sunday, skip to Monday
+      initialDate = initialDate.add(const Duration(days: 1));
+    }
     final DateTime? picked = await showDatePicker(
       context: context,
-      initialDate: DateTime.now(),
+      initialDate: initialDate,
       firstDate: DateTime.now(),
       lastDate: DateTime(DateTime.now().year, DateTime.now().month + 1, DateTime.now().day),
+      selectableDayPredicate: (DateTime date) {
+        return date.weekday != 6 && date.weekday != 7; // Disable weekends
+      },
     );
     if (picked != null && picked != _selectedDate) {
       setState(() {

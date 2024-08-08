@@ -75,100 +75,81 @@ class _GaragePageState extends State<GaragePage> {
       if (vehiclesString != null) {
         final List<dynamic> vehiclesList = jsonDecode(vehiclesString);
         setState(() {
-          _vehicles = Vehicle.fromMapList(vehiclesList);
-        });
-      }
-      setState(() {
-        _isWarningVisible = true;
+        _vehicles = Vehicle.fromMapList(vehiclesList);
         _isLoading = false;
+        _isWarningVisible = true;
       });
+      }
     }
   }
 
   void _addVehicle(String make, String model, FuelType fuelType, String vinNumber, bool isDefault) async {
-    final user = _userProvider!.user;
+  final user = _userProvider!.user;
 
-    if (user != null) {
-      var collection = _firestore.collection('users').doc(user.uid).collection('vehicles');
-      var snapshot = await collection.get();
-      var vehicles = snapshot.docs.map((doc) => Vehicle.fromMap(doc.data()..putIfAbsent('uid', () => doc.id))).toList();
-
-      if (vehicles.isEmpty) {
-        // If no vehicles, directly add as default
-        var docRef = await collection.add({
-          'make': make,
-          'model': model,
-          'fuelType': fuelType.name,
-          'vinNumber': vinNumber,
-          'isDefault': true
-        });
-        setState(() {
-          _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: true));
-        });
-      } else {
-        if (isDefault) {
-          // Unset all other defaults first
-          List<Future> updates = vehicles.where((v) => v.isDefault).map((vehicle) {
-            return collection.doc(vehicle.uid).update({'isDefault': false});
-          }).toList();
-
-          await Future.wait(updates); // Ensure all updates complete before proceeding
-
-          // After unsetting defaults, add the new default vehicle
-          var docRef = await collection.add({
-            'make': make,
-            'model': model,
-            'fuelType': fuelType.name,
-            'vinNumber': vinNumber,
-            'isDefault': true
-          });
-          setState(() {
-            for (var v in vehicles) {
-              v.isDefault = false; // Update local list state
-            }
-            _vehicles = vehicles;
-            _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: true));
-          });
-        } else {
-          // Add non-default vehicle
-          var docRef = await collection.add({
-            'make': make,
-            'model': model,
-            'fuelType': fuelType.name,
-            'vinNumber': vinNumber,
-            'isDefault': false
-          });
-          setState(() {
-            _vehicles.add(Vehicle(uid: docRef.id, make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: false));
-          });
-        }
+  if (user != null) {
+    var collection = _firestore.collection('users').doc(user.uid).collection('vehicles');
+    if (isDefault) {
+      // First, ensure no other vehicle is set as default
+      var snapshot = await collection.where('isDefault', isEqualTo: true).get();
+      for (var doc in snapshot.docs) {
+        await doc.reference.update({'isDefault': false});
       }
-    } else {
-      // Local storage handling for non-authenticated users
-      setState(() {
-        _vehicles.add(Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: _vehicles.isEmpty));
-        _saveVehicles();
-      });
     }
+    
+    // Then add the new vehicle
+    await collection.add({
+      'make': make,
+      'model': model,
+      'fuelType': fuelType.name,
+      'vinNumber': vinNumber,
+      'isDefault': isDefault
+    }).then((value) => _vehicles.add(Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: isDefault)));
+    _loadVehicles();
+
+  } else {
+    // Handle non-authenticated user case
+    setState(() {
+      _vehicles.add(Vehicle(make: make, model: model, fuelType: fuelType, vinNumber: vinNumber, isDefault: isDefault));
+      _saveVehicles();
+      setState(() {});
+    });
+  }
+}
+
+void _removeVehicle(int index) async {
+  final user = _userProvider!.user;
+  if (user == null) {
+    // For non-authenticated users, manage locally only
+    setState(() {
+      _vehicles.removeAt(index);
+      _saveVehicles();
+    });
+    return;
   }
 
-  void _removeVehicle(int index) {
-    final user = _userProvider!.user;
+  var docRef = _firestore.collection('users').doc(user.uid).collection('vehicles').doc(_vehicles[index].uid);
+  try {
+    var removedVehicle = _vehicles.removeAt(index);
+    await docRef.delete();
 
-    if (user != null) {
-      var docRef = _firestore.collection('users').doc(user.uid).collection('vehicles').doc(_vehicles[index].uid);
-      docRef.delete().then((_) {
-        setState(() {
-          _vehicles.removeAt(index);
-        });
-      });
-    } else {
-      setState(() {
-        _vehicles.removeAt(index);
-        _saveVehicles();
-      });
+    Vehicle? newDefaultVehicle;
+
+    // Check if the removed vehicle was the default and if so, assign a new default
+    if (removedVehicle.isDefault && _vehicles.isNotEmpty) {
+      newDefaultVehicle = _vehicles.first;
+      await _firestore.collection('users').doc(user.uid).collection('vehicles').doc(newDefaultVehicle.uid).update({'isDefault': true});
+      // Update the default vehicle in the UserProvider
+      _userProvider!.updateDefaultVehicle(newDefaultVehicle);
+    } else if (_vehicles.isEmpty) {
+      _userProvider!.updateDefaultVehicle(null);  // No vehicles left, set default to null
     }
+
+    setState(() {});
+
+  } catch (e) {
+    ScaffoldMessenger.of(context).showSnackBar(SnackBar(content: Text("Failed to remove vehicle: $e")));
   }
+}
 
   Future<void> _saveVehicles() async {
     final user = _userProvider!.user;
@@ -319,6 +300,7 @@ class _GaragePageState extends State<GaragePage> {
       floatingActionButton: _vehicles.length < 5
           ? FloatingActionButton(
               onPressed: () {
+                print(_vehicles);
                 // Navigate to the AddVehiclePage
                 Navigator.push(
                   context,

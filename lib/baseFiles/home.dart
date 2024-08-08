@@ -1,9 +1,14 @@
+import 'package:automate/baseFiles/classes/vehicle.dart';
+import 'package:automate/baseFiles/user_provider.dart';
+import 'package:automate/homeOptions/garagePage/edit_vehicle.dart';
+import 'package:firebase_auth/firebase_auth.dart';
 import 'package:flutter/material.dart';
 import 'package:automate/baseFiles/app_theme.dart';
 import 'package:automate/homeOptions/homePage/home_page.dart';
 import 'package:automate/homeOptions/garagePage/garage_page.dart';
 import 'package:automate/homeOptions/profilePage/profile_page.dart';
 import 'package:automate/homeOptions/servicesPage/services_page.dart';
+import 'package:provider/provider.dart';
 
 class HomeScreen extends StatefulWidget {
   final int currentPageIndex;

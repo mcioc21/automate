@@ -1,5 +1,8 @@
+import 'package:automate/baseFiles/classes/vehicle.dart';
+import 'package:automate/baseFiles/user_provider.dart';
 import 'package:flutter/material.dart';
 import 'package:automate/homeOptions/vehicleOptions/fuel_type.dart';
+import 'package:provider/provider.dart';
 
 class AddVehiclePage extends StatefulWidget {
   final void Function(String make, String model, FuelType fuelType,
@@ -51,6 +54,12 @@ class _AddVehiclePageState extends State<AddVehiclePage> {
         _selectedFuelType != null) {
       widget.addVehicleCallback(
           make, model, _selectedFuelType!, vinNumber, _isDefault);
+      if (_isDefault) {
+      Provider.of<UserProvider>(context, listen: false).updateAfterVehicleChange(
+        Vehicle(make: make, model: model, fuelType: _selectedFuelType!, vinNumber: vinNumber),
+        true
+      );
+      }
       Navigator.pop(context);
     } else {
       ScaffoldMessenger.of(context).showSnackBar(

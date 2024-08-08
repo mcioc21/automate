@@ -63,6 +63,17 @@ class UserProvider with ChangeNotifier {
     notifyListeners();
   }
 
+  void updateAfterVehicleChange(Vehicle? vehicle, bool isDefault) {
+    if (isDefault) {
+      updateDefaultVehicle(vehicle); // Directly update the default vehicle
+    }
+}
+
+  void updateDefaultVehicle(Vehicle? vehicle) {
+    _defaultVehicle = vehicle;
+    notifyListeners();
+  }
+
   void fetchDefaultVehicle(User? user) async {
     try {
       if(user != null){

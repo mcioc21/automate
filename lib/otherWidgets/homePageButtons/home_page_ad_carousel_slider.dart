@@ -1,7 +1,7 @@
 import 'package:carousel_slider/carousel_slider.dart';
 import 'package:flutter/material.dart';
 
-Widget homePageAdCarouselSlider(BuildContext context) {
+Widget homePageAdCarouselSlider(BuildContext context, void Function(String)? navigateToServices) {
   return CarouselSlider(
     options: CarouselOptions(
       height: MediaQuery.of(context).size.height * 0.25,
@@ -28,15 +28,9 @@ Widget homePageAdCarouselSlider(BuildContext context) {
                 child: InkWell(
                   onTap: () {
                     if(i == 'assets/ZUBER.png') {
-                      // Navigator.push(
-                      //             context,
-                      //             MaterialPageRoute(builder: (context) => const WorkshopsPage()),
-                      //           );
+                      navigateToServices?.call('choosePartner');
                     } else if(i == 'assets/detailing_ad.png') {
-                      // Navigator.push(
-                      //             context,
-                      //             MaterialPageRoute(builder: (context) => const DiscountsPage()),
-                      //           );
+                      navigateToServices?.call('chooseDiscount');
                     }
                   },
                   child: Image.asset(

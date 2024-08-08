@@ -1,5 +1,6 @@
 import 'package:automate/baseFiles/app_theme.dart';
 import 'package:automate/baseFiles/classes/workshop.dart';
+import 'package:automate/homeOptions/servicesPage/details_workshop.dart';
 import 'package:flutter/material.dart';
 import 'package:google_maps_flutter/google_maps_flutter.dart';
 
@@ -109,7 +110,7 @@ class _MapPageState extends State<MapPage> {
         const SizedBox(height: 16),
         ElevatedButton(
           onPressed: () {
-            // Implement navigation to see more details or booking
+            Navigator.of(context).push(MaterialPageRoute(builder: (context) => DetailsWorkshopPage(workshop: _selectedWorkshop!)));
           },
           style: ElevatedButton.styleFrom(
             minimumSize: const Size.fromHeight(36),

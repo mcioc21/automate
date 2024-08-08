@@ -101,11 +101,10 @@ class _HomePageState extends State<HomePage> {
                 children:
                   [
                     HomePageAppointmentButton(navigateToServices:  widget.onNavigateToServices),
-                    homePageVehicleDetailsButton(context),
                   ]
               ),
             ),
-          homePageAdCarouselSlider(context),
+          homePageAdCarouselSlider(context, widget.onNavigateToServices),
           ListTile(
               title: Container(
           padding: const EdgeInsets.only(left: 15.0, top: 5),
